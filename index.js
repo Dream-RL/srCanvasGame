@@ -743,7 +743,7 @@ function loadEverything() {
     }
 
     //set daytime variable
-    if (currentHour >= 6 && currentHour < 8 && currentMinute < 15) {
+    if (currentHour >= 6 && currentHour < 8) {
       morning = true;
       dayTime = false;
       evening = false;

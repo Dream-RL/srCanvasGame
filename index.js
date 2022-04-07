@@ -417,7 +417,7 @@ const foodImage = document.querySelector(".food");
 const foodToEatImage = document.querySelector(".foodToEat");
 const floorImage = document.querySelector(".floor");
 const wallImage = document.querySelector(".wall");
-let nftName = "Los Angeles";
+let nftName = "Anchorage";
 let weatherCalled = false;
 let snows;
 let rains;
@@ -432,8 +432,8 @@ let foodClicked = false;
 
 //OBJECTS
 const mouse = {
-x: 0,
-y: 0,
+  x: 0,
+  y: 0,
 };
 
 const player = {
@@ -479,7 +479,7 @@ let foodToEat = {
   h: 66,
   x: 495,
   y: 195,
-}
+};
 
 //DRAW FUNCTIONS
 function drawPlayer() {
@@ -495,7 +495,13 @@ function drawFood() {
 }
 
 function drawFoodToEat() {
-  ctx.drawImage(foodToEatImage, foodToEat.x, foodToEat.y, foodToEat.w, foodToEat.h);
+  ctx.drawImage(
+    foodToEatImage,
+    foodToEat.x,
+    foodToEat.y,
+    foodToEat.w,
+    foodToEat.h
+  );
 }
 
 function drawFloor() {
@@ -511,13 +517,13 @@ const index = Countries.findIndex((object) => {
   return object.name === nftName;
 });
 
-    //create random numbers
+//create random numbers
 const ranNums = {
   eat: Math.floor(Math.random() * 60) + 1,
   sleep: Math.floor(Math.random() * 60) + 1,
 };
 
-    //clear function
+//clear function
 function clear() {
   // ctx.clearRect(0, 80, 300, 70);
   // ctx.clearRect(0, 0, 300, 15);
@@ -528,7 +534,6 @@ function clear() {
   ctx.fill();
   ctx.closePath();
 }
-
 
 //WEATHER
 function rain() {
@@ -729,10 +734,11 @@ weather();
 function loadEverything() {
   function time() {
     let date = new Date();
-    let currentHour = date.getUTCHours() + Countries[index].time; 
+    let currentHour = date.getUTCHours() + Countries[index].time;
     let currentMinute = 0;
     let currentSecond = date.getUTCSeconds();
     let milliseconds = date.getUTCMilliseconds();
+
     if (
       Countries[index].name == "Tehran" ||
       Countries[index].name == "Mumbai"
@@ -741,7 +747,16 @@ function loadEverything() {
     } else {
       currentMinute = date.getUTCMinutes();
     }
-
+    // make sure time doesn't go above 24 hours of the day
+    if (currentHour > 24) {
+      console.log("time greater than 24");
+      currentHour = currentHour - 24;
+    }
+    // make sure time doesn't go bellow 1 hours of the day
+    if (currentHour < 1) {
+      console.log("time less than 1");
+      currentHour = currentHour + 24;
+    }
     //set daytime variable
     if (currentHour >= 6 && currentHour < 8) {
       morning = true;
@@ -765,29 +780,29 @@ function loadEverything() {
       nightTime = true;
     }
 
-        //adds a zero to the minutes and seconds if below 10
-        let time = "";
-        if (currentMinute < 10 && currentSecond >= 10) {
-          time = currentHour + ":0" + currentMinute + ":" + currentSecond;
-        } else if (currentMinute < 10 && currentSecond < 10) {
-          time = currentHour + ":0" + currentMinute + ":0" + currentSecond;
-        } else if (currentMinute >= 10 && currentSecond < 10) {
-          time = currentHour + ":" + currentMinute + ":0" + currentSecond;
-        } else {
-          time = currentHour + ":" + currentMinute + ":" + currentSecond;
-        }
-        
-        //text color based on day or night time
-        if (dayTime === true || morning === true) {
-          ctx.fillStyle = "black";
-        } else {
-          ctx.fillStyle = "white";
-        }
-    
-        ctx.font = "20px Verdana";
-        ctx.fillText(time, (canvas.width / 2) - 50 , 25);
-        // for testing
-        ctx.fillText("player x: " + player.x, 10, 25);
+    //adds a zero to the minutes and seconds if below 10
+    let time = "";
+    if (currentMinute < 10 && currentSecond >= 10) {
+      time = currentHour + ":0" + currentMinute + ":" + currentSecond;
+    } else if (currentMinute < 10 && currentSecond < 10) {
+      time = currentHour + ":0" + currentMinute + ":0" + currentSecond;
+    } else if (currentMinute >= 10 && currentSecond < 10) {
+      time = currentHour + ":" + currentMinute + ":0" + currentSecond;
+    } else {
+      time = currentHour + ":" + currentMinute + ":" + currentSecond;
+    }
+
+    //text color based on day or night time
+    if (dayTime === true || morning === true) {
+      ctx.fillStyle = "black";
+    } else {
+      ctx.fillStyle = "white";
+    }
+
+    ctx.font = "20px Verdana";
+    ctx.fillText(time, canvas.width / 2 - 50, 25);
+    // for testing
+    ctx.fillText("player x: " + player.x, 10, 25);
 
     // if (currentSecond % 3 == 0 && milliseconds <= 16.6) {
     //   if (currentSecond > 40 && currentSecond < 43) {
@@ -804,36 +819,34 @@ function loadEverything() {
     // }
   }
 
-//sky color
-function defaultSky() {
-  if (morning === true && raining === true) {
-    canvas.style.background = "linear-gradient(#1F6064, #E8AE56)";
-  } else if (dayTime === true && raining === true) {
-    canvas.style.background = "linear-gradient(#9BB9B8, #3F8F93)";
-  } else if (evening === true && raining === true) {
-    canvas.style.background = "linear-gradient(#9BB9B8, #1F6064)";
-  } else if (nightTime === true && raining === true) {
-    canvas.style.background = "linear-gradient(#0D0627, #000000)";
-  } 
-  else if (morning === true && snowing === true) {
-    canvas.style.background = "linear-gradient(#31C4BF, #DAF8C3)";
-  } else if (dayTime === true && snowing === true) {
-    canvas.style.background = "linear-gradient(#CCFFFD, #31C4BF)";
-  } else if (evening === true && snowing === true) {
-    canvas.style.background = "linear-gradient(#DAF8C3, #31C4BF)";
-  } else if (nightTime === true && snowing === true) {
-    canvas.style.background = "linear-gradient(#0D0627, #000000)";
-  } 
-  else if (morning === true && sunny === true) {
-    canvas.style.background = "linear-gradient(#31C4BF, #E8AE56)";
-  } else if (dayTime === true && sunny === true) {
-    canvas.style.background = "linear-gradient(#D3FFFF, #56E7E7)";
-  } else if (evening === true && sunny === true) {
-    canvas.style.background = "linear-gradient(#E8AE56, #D3FFFF)";
-  } else if (nightTime === true && sunny === true) {
-    canvas.style.background = "linear-gradient(#0D0627, #000000)";
-  } 
-}
+  //sky color
+  function defaultSky() {
+    if (morning === true && raining === true) {
+      canvas.style.background = "linear-gradient(#1F6064, #E8AE56)";
+    } else if (dayTime === true && raining === true) {
+      canvas.style.background = "linear-gradient(#9BB9B8, #3F8F93)";
+    } else if (evening === true && raining === true) {
+      canvas.style.background = "linear-gradient(#9BB9B8, #1F6064)";
+    } else if (nightTime === true && raining === true) {
+      canvas.style.background = "linear-gradient(#0D0627, #000000)";
+    } else if (morning === true && snowing === true) {
+      canvas.style.background = "linear-gradient(#31C4BF, #DAF8C3)";
+    } else if (dayTime === true && snowing === true) {
+      canvas.style.background = "linear-gradient(#CCFFFD, #31C4BF)";
+    } else if (evening === true && snowing === true) {
+      canvas.style.background = "linear-gradient(#DAF8C3, #31C4BF)";
+    } else if (nightTime === true && snowing === true) {
+      canvas.style.background = "linear-gradient(#0D0627, #000000)";
+    } else if (morning === true && sunny === true) {
+      canvas.style.background = "linear-gradient(#31C4BF, #E8AE56)";
+    } else if (dayTime === true && sunny === true) {
+      canvas.style.background = "linear-gradient(#D3FFFF, #56E7E7)";
+    } else if (evening === true && sunny === true) {
+      canvas.style.background = "linear-gradient(#E8AE56, #D3FFFF)";
+    } else if (nightTime === true && sunny === true) {
+      canvas.style.background = "linear-gradient(#0D0627, #000000)";
+    }
+  }
 
   defaultSky();
 
@@ -961,9 +974,6 @@ document.addEventListener("click", (event) => {
     }
   }
   hungryClicked();
-
-
-
 });
 loadEverything();
 
@@ -971,15 +981,17 @@ document.addEventListener("mousedown", (event) => {
   let bound = canvas.getBoundingClientRect();
   let x = event.clientX - bound.left - canvas.clientLeft;
   let y = event.clientY - bound.top - canvas.clientTop;
-    //move food with mouse when clicked
-    if (x > 489 && x < 571 && y > 194 && y < 257) {
-      document.addEventListener("mousemove", function(event) {
-        let bound = canvas.getBoundingClientRect();
-        foodToEat.x = (event.clientX - bound.left - canvas.clientLeft) - foodToEat.w/2;
-        foodToEat.y = (event.clientY - bound.top - canvas.clientTop) - foodToEat.h/2;
-        foodClicked = true;
-       });
-    }
+  //move food with mouse when clicked
+  if (x > 489 && x < 571 && y > 194 && y < 257) {
+    document.addEventListener("mousemove", function (event) {
+      let bound = canvas.getBoundingClientRect();
+      foodToEat.x =
+        event.clientX - bound.left - canvas.clientLeft - foodToEat.w / 2;
+      foodToEat.y =
+        event.clientY - bound.top - canvas.clientTop - foodToEat.h / 2;
+      foodClicked = true;
+    });
+  }
 });
 
 document.addEventListener("mouseup", (event) => {
@@ -987,30 +999,30 @@ document.addEventListener("mouseup", (event) => {
   let x = event.clientX - bound.left - canvas.clientLeft;
   let y = event.clientY - bound.top - canvas.clientTop;
 
-    //put food back on table
-    if (x > 409 && x < 591 && y > 234 && y < 282 && foodClicked === true) {
-      document.addEventListener("mousemove", function(event) {
-        foodToEat.x = 495;
-        foodToEat.y = 195;
-        foodClicked = false;
-       });
-    }
+  //put food back on table
+  if (x > 409 && x < 591 && y > 234 && y < 282 && foodClicked === true) {
+    document.addEventListener("mousemove", function (event) {
+      foodToEat.x = 495;
+      foodToEat.y = 195;
+      foodClicked = false;
+    });
+  }
 
-        if (foodClicked === true && 
-      foodToEat.x - (player.x + player.w) <= -50 && 
-      foodToEat.x - (player.x + player.w) >= -200 &&
-      foodToEat.y - (player.y + player.h) <= 5 &&
-      foodToEat.y - (player.y + player.h) >= -225
-      ) {
-        document.addEventListener("mousemove", function(event) {
-          foodToEat.x = 495;
-          foodToEat.y = 195;
-          foodClicked = false;
-         });
-      console.log("on rabbit!");
-    }
+  if (
+    foodClicked === true &&
+    foodToEat.x - (player.x + player.w) <= -50 &&
+    foodToEat.x - (player.x + player.w) >= -200 &&
+    foodToEat.y - (player.y + player.h) <= 5 &&
+    foodToEat.y - (player.y + player.h) >= -225
+  ) {
+    document.addEventListener("mousemove", function (event) {
+      foodToEat.x = 495;
+      foodToEat.y = 195;
+      foodClicked = false;
+    });
+    console.log("on rabbit!");
+  }
 });
-
 
 document.addEventListener("keydown", keyDown);
 document.addEventListener("keyup", keyUp);

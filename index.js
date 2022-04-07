@@ -586,6 +586,21 @@ window.addEventListener('load', function(){
         }
     };
 
+    class Scenery {
+        constructor(gameWidth, gameHeight){
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 243;
+            this.height = 293;
+            this.x = 280;
+            this.y = 0;
+            this.image = document.querySelector(".scenery");
+        }
+        draw(context){
+            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+    };
+
     class Snowflake {
         constructor(){
             this.x = Math.random() * canvas.width;
@@ -809,6 +824,7 @@ window.addEventListener('load', function(){
     const food = new Food(canvas.width, canvas.height);
     const floor = new Floor(canvas.width, canvas.height);
     const wall = new Wall(canvas.width, canvas.height);
+    const scenery = new Scenery(canvas.width, canvas.height);
     const snowArray = [];
     for (let i = 0; i < 100; i++){
         snowArray.push(new Snowflake);
@@ -834,7 +850,8 @@ window.addEventListener('load', function(){
         bedCollision();
         foodCollision();
         defaultSky();
-        
+        scenery.draw(ctx);
+
         if (weatherTimer > weatherInterval) {
             weather(deltaTime);
             weatherTimer = 0;

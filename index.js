@@ -406,7 +406,7 @@ window.addEventListener('load', function(){
     ];
     
     //LOCATION
-    let nftName = "Yellowknife";
+    let nftName = "Los Angeles";
 
     //CANVAS
     const canvas = document.getElementById("Canvas");
@@ -427,6 +427,13 @@ window.addEventListener('load', function(){
     let rains;
     let bedCollided;
     let tableCollided;
+    let starSpeed;
+    let xv;
+    let yv;
+    let lastTime = 0;
+    let weatherTimer = 0;
+    let weatherInterval = 5000;
+    let deltaTime = 0;
 
     //OPERATIONS
     const index = Countries.findIndex((object) => {
@@ -605,7 +612,7 @@ window.addEventListener('load', function(){
         constructor(){
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 5 + 1;
+            this.size = Math.random() * 4 + 0.5;
             this.speed = Math.random() * 0.5 + 0.2;
         }
         update(){
@@ -638,6 +645,44 @@ window.addEventListener('load', function(){
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
             ctx.fill();
+        }
+    };
+
+    class Stars {
+        constructor(){
+            this.colorSpace = 'black';
+            this.colorStars = 'lightyellow';
+            this.starNum = 200;
+            this.size = 0.005;
+            this.speed = 0.05; 
+        }
+        update(){
+            for (let i = 0; i < star.starNum; i++) {
+            stars[i].x += 0.01;
+            stars[i].y += 0.01;
+
+            if (stars[i].x < 0 - stars[i].r) {
+                stars[i].x = canvas.width + stars[i].r;
+            } else if (stars[i].x > canvas.width + stars[i].r) {
+                stars[i].x = 0 - stars[i].r;
+            }
+
+            if (stars[i].y < 0 - stars[i].r) {
+                stars[i].y = canvas.height + stars[i].r;
+            } else if (stars[i].y > canvas.height + stars[i].r) {
+                stars[i].y = 0 - stars[i].r;
+            }
+
+            }
+        }
+        draw(canvas){
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = star.colorStars;
+            for (let i = 0; i < star.starNum; i++) {
+                ctx.beginPath();
+                ctx.arc(stars[i].x, stars[i].y, stars[i].r, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
     };
 
@@ -801,6 +846,8 @@ window.addEventListener('load', function(){
         }
     };
 
+
+
     function bedCollision() {
         if (player.x <= 150) {
             bedCollided = true;
@@ -825,8 +872,9 @@ window.addEventListener('load', function(){
     const floor = new Floor(canvas.width, canvas.height);
     const wall = new Wall(canvas.width, canvas.height);
     const scenery = new Scenery(canvas.width, canvas.height);
+    const star = new Stars(canvas.width, canvas.height);
     const snowArray = [];
-    for (let i = 0; i < 100; i++){
+    for (let i = 0; i < 150; i++){
         snowArray.push(new Snowflake);
     };
 
@@ -835,10 +883,17 @@ window.addEventListener('load', function(){
         rainArray.push(new Raindrop);
     };
 
-    let lastTime = 0;
-    let weatherTimer = 0;
-    let weatherInterval = 5000;
-    let deltaTime = 0;
+    const stars = [];
+    for (let i = 0; i < star.starNum; i++) {
+        let speedMult = Math.random() * 1.5 + 0.5;
+        stars[i] = {
+            r: Math.random() * star.size * canvas.width / 2,
+            x: Math.floor(Math.random() * canvas.width),
+            y: Math.floor(Math.random() * canvas.height),
+            xv: xv * speedMult,
+            yv: yv * speedMult
+        }
+    }
 
     weather(deltaTime);
 
@@ -850,6 +905,12 @@ window.addEventListener('load', function(){
         bedCollision();
         foodCollision();
         defaultSky();
+
+        if (nightTime == true) {
+            star.draw(canvas);
+            star.update();
+        }
+        
         scenery.draw(ctx);
 
         if (weatherTimer > weatherInterval) {
@@ -873,6 +934,7 @@ window.addEventListener('load', function(){
         player.draw(ctx);
 
         clock(canvas);
+
 
         player.update(input);
         requestAnimationFrame(animate)

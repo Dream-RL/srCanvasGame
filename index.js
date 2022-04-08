@@ -425,7 +425,7 @@ window.addEventListener('load', function(){
   let yv = 0;
   let lastTime = 0;
   let weatherTimer = 0;
-  let weatherInterval = 100000;
+  let weatherInterval = 10000;
   let deltaTime = 0;
 
   //OPERATIONS
@@ -641,9 +641,8 @@ window.addEventListener('load', function(){
 
   class Stars {
     constructor(){
-      this.colorSpace = 'black';
       this.colorStars = 'lightyellow';
-      this.starNum = 200;
+      this.starNum = 120;
       this.size = 0.005;
       this.speed = 0.05; 
     }
@@ -652,15 +651,15 @@ window.addEventListener('load', function(){
       stars[i].x += 0.01;
       stars[i].y += 0.01;
 
-      if (stars[i].x < 0 - stars[i].r) {
-        stars[i].x = canvas.width + stars[i].r;
-      } else if (stars[i].x > canvas.width + stars[i].r) {
-          stars[i].x = 0 - stars[i].r;
+      if (stars[i].x < 275 - stars[i].r) {
+        stars[i].x = 525 + stars[i].r;
+      } else if (stars[i].x > 525 + stars[i].r) {
+          stars[i].x = 275 - stars[i].r;
       }
 
       if (stars[i].y < 0 - stars[i].r) {
-        stars[i].y = canvas.height + stars[i].r;
-      } else if (stars[i].y > canvas.height + stars[i].r) {
+        stars[i].y = 270 + stars[i].r;
+      } else if (stars[i].y > 270 + stars[i].r) {
         stars[i].y = 0 - stars[i].r;
       }
       }
@@ -694,12 +693,12 @@ window.addEventListener('load', function(){
     }
     // make sure time doesn't go above 24 hours of the day
     if (currentHour > 24) {
-      console.log("time greater than 24");
+      // console.log("time greater than 24");
       currentHour = currentHour - 24;
     }
     // make sure time doesn't go bellow 1 hours of the day
     if (currentHour < 1) {
-      console.log("time less than 1");
+      // console.log("time less than 1");
       currentHour = currentHour + 24;
     }
     //set daytime variable
@@ -847,14 +846,14 @@ window.addEventListener('load', function(){
   function handleCollisions() {
     if (player.x <= 150) {
       bedCollided = true;
-      console.log("Bed collided.");
+      // console.log("Bed collided.");
     } else {
       bedCollided = false;
     }
 
     if (player.x >= 285) {
       tableCollided = true;
-      console.log("Table collided.");
+      // console.log("Table collided.");
     } else {
       tableCollided = false;
     }
@@ -886,8 +885,8 @@ window.addEventListener('load', function(){
       let speedMult = Math.random() * 1.5 + 0.5;
       stars[i] = {
           r: Math.random() * star.size * canvas.width / 2,
-          x: Math.floor(Math.random() * canvas.width),
-          y: Math.floor(Math.random() * canvas.height),
+          x: Math.floor(Math.random() * 250 + 275),
+          y: Math.floor(Math.random() * 270),
           xv: xv * speedMult,
           yv: yv * speedMult
       }

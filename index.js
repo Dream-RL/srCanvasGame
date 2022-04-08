@@ -425,7 +425,7 @@ window.addEventListener('load', function(){
   let yv = 0;
   let lastTime = 0;
   let weatherTimer = 0;
-  let weatherInterval = 5000;
+  let weatherInterval = 100000;
   let deltaTime = 0;
 
   //OPERATIONS
@@ -601,8 +601,8 @@ window.addEventListener('load', function(){
   class Snowflake {
     //NEED TO SPLICE OUT OF ARRAY INSTEAD OF REUSING PARTICLES TO END CLEANLY
     constructor(){
-      this.x = Math.random() * canvas.width;
-      this.y = 0;
+      this.x = Math.random() * 250 + 277;
+      this.y = Math.random() * canvas.height;
       this.size = Math.random() * 4 + 0.5;
       this.speed = Math.random() * 0.5 + 0.2;
     }
@@ -621,8 +621,8 @@ window.addEventListener('load', function(){
 
   class Raindrop {
     constructor(){
-      this.x = Math.random() * canvas.width;
-      this.y = 0;
+      this.x = Math.random() * 250 + 277;
+      this.y = Math.random() * canvas.height;
       this.size = Math.random() * 1.5 + 1;
       this.speed = Math.random() * 2 + 1.3;
     }
@@ -837,28 +837,28 @@ window.addEventListener('load', function(){
     }
   };
 
-  function bedCollision() {
-    if (player.x <= 150) {
-      bedCollided = true;
-    } else {
-      bedCollided = false;
-    }
-  };
-
-  function foodCollision() {
-    if (player.x >= 285) {
-      tableCollided = true;
-    } else {
-      tableCollided = false;
-    }
-  };
-
-  function handleClick() {
+  function handleClick(event) {
     let bound = canvas.getBoundingClientRect();
     let x = event.clientX - bound.left - canvas.clientLeft;
     let y = event.clientY - bound.top - canvas.clientTop;
     console.log("clicked X:" + x + " Y:" + y);
   };
+
+  function handleCollisions() {
+    if (player.x <= 150) {
+      bedCollided = true;
+      console.log("Bed collided.");
+    } else {
+      bedCollided = false;
+    }
+
+    if (player.x >= 285) {
+      tableCollided = true;
+      console.log("Table collided.");
+    } else {
+      tableCollided = false;
+    }
+  }
 
   //BUILD GAME
   const input = new InputHandler();
@@ -872,12 +872,12 @@ window.addEventListener('load', function(){
   const star = new Stars(canvas.width, canvas.height);
 
   const snowArray = [];
-  for (let i = 0; i < 200; i++){
+  for (let i = 0; i < 100; i++){
       snowArray.push(new Snowflake);
   };
 
   const rainArray = [];
-  for (let i = 0; i < 200; i++){
+  for (let i = 0; i < 75; i++){
       rainArray.push(new Raindrop);
   };
 
@@ -900,8 +900,7 @@ window.addEventListener('load', function(){
     lastTime = timeStamp;
     ctx.clearRect(0,0,canvas.width,canvas.height);
     time();
-    bedCollision();
-    foodCollision();
+    handleCollisions();
     defaultSky();
 
     if (nightTime == true) {
@@ -930,17 +929,15 @@ window.addEventListener('load', function(){
     table.draw(ctx);
     food.draw(ctx);
     player.draw(ctx);
-
     clock(canvas);
-
-
     player.update(input);
+
     requestAnimationFrame(animate)
   }
   animate(0);
 
   //EVENT LISTENERS
   document.addEventListener("click", (event) => {
-    handleClick();
+    handleClick(event);
   });
 });

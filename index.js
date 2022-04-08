@@ -406,7 +406,7 @@ window.addEventListener('load', function(){
     ];
     
     //LOCATION
-    let nftName = "Los Angeles";
+    let nftName = "Yellowknife";
 
     //CANVAS
     const canvas = document.getElementById("Canvas");
@@ -416,10 +416,6 @@ window.addEventListener('load', function(){
     
     //VARIABLES
     let currentTime = "";
-    let currentHour;
-    let currentMinute;
-    let currentSecond;
-    let milliseconds;
     let raining = true;
     let snowing = true;
     let sunny = true;
@@ -444,9 +440,6 @@ window.addEventListener('load', function(){
         eat: Math.floor(Math.random() * 60) + 1,
         sleep: Math.floor(Math.random() * 60) + 1,
     };
-
-    let chance = Math.floor(Math.random() * 365) + 1;;
-    let rainChance = Countries[index].rain - Countries[index].snow;
 
     //CLASSES
     class InputHandler {
@@ -609,9 +602,10 @@ window.addEventListener('load', function(){
     };
 
     class Snowflake {
+        //NEED TO SPLICE OUT OF ARRAY INSTEAD OF REUSING PARTICLES TO END CLEANLY
         constructor(){
             this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
+            this.y = 0;
             this.size = Math.random() * 4 + 0.5;
             this.speed = Math.random() * 0.5 + 0.2;
         }
@@ -631,8 +625,8 @@ window.addEventListener('load', function(){
     class Raindrop {
         constructor(){
             this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 1.5;
+            this.y = 0;
+            this.size = Math.random() * 1.5 + 1;
             this.speed = Math.random() * 2 + 1.3;
         }
         update(){
@@ -750,9 +744,10 @@ window.addEventListener('load', function(){
     function clock(canvas) {
         ctx.fillStyle = "black";
         ctx.font = "20px Verdana";
-        ctx.fillText(currentTime, 10, 60);
+        ctx.fillText(currentTime, 10, 55);
         // for testing
-        ctx.fillText("player x: " + player.x, 10, 25);
+        // ctx.fillText("player x: " + player.x, 10, 25);
+        ctx.fillText(nftName, 10, 25);
     };
 
     function defaultSky() {
@@ -846,8 +841,6 @@ window.addEventListener('load', function(){
         }
     };
 
-
-
     function bedCollision() {
         if (player.x <= 150) {
             bedCollided = true;
@@ -864,6 +857,7 @@ window.addEventListener('load', function(){
         }
     };
 
+    //BUILD GAME
     const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
     const bed = new Bed(canvas.width, canvas.height);
@@ -873,8 +867,9 @@ window.addEventListener('load', function(){
     const wall = new Wall(canvas.width, canvas.height);
     const scenery = new Scenery(canvas.width, canvas.height);
     const star = new Stars(canvas.width, canvas.height);
+
     const snowArray = [];
-    for (let i = 0; i < 150; i++){
+    for (let i = 0; i < 200; i++){
         snowArray.push(new Snowflake);
     };
 
@@ -941,6 +936,7 @@ window.addEventListener('load', function(){
     }
     animate(0);
 
+    //EVENT LISTENERS
     document.addEventListener("click", (event) => {
         let bound = canvas.getBoundingClientRect();
         let x = event.clientX - bound.left - canvas.clientLeft;
@@ -958,5 +954,5 @@ window.addEventListener('load', function(){
         //   }
         // }
         // hungryClicked();
-      });
+    });
 });

@@ -414,7 +414,8 @@ window.addEventListener('load', function(){
   ];
     
   //LOCATION
-  let nftName = "Vancouver";
+  //PROBLEM WITH MUMBAI - MINUTES START AT 30 AND END AT 90
+  let nftName = "Kyiv";
 
   //CANVAS
   const canvas = document.getElementById("Canvas");
@@ -474,20 +475,20 @@ window.addEventListener('load', function(){
         }
         // console.log(event.key, this.keys);
       });
-    }
+    };
   };
 
   class Player {
     constructor(){
       this.width = 244;
       this.height = 271;
-      this.x = Math.floor(Math.random() * 399) + 51;
+      this.x = Math.floor(Math.random() * 300) + 100;
       this.y = 400;
       this.image = document.querySelector(".player");
       this.speed = 0;
       this.vy = 0;
       this.weight = 0.15;
-    }
+    };
     draw(context){
       context.drawImage(this.image, this.x, this.y);
     }
@@ -526,7 +527,7 @@ window.addEventListener('load', function(){
       this.width = 321;
       this.height = 207;
       this.x = 0;
-      this.y = 270;
+      this.y = (canvas.height - this.height) - 25;
       this.image = document.querySelector(".bed");
     }
     draw(context){
@@ -539,7 +540,7 @@ window.addEventListener('load', function(){
       this.width = 223;
       this.height = 140;
       this.x = canvas.width - this.width;
-      this.y = 335;
+      this.y = (canvas.height - this.height) - 25;
       this.image = document.querySelector(".food");
     }
     draw(context){
@@ -578,7 +579,7 @@ window.addEventListener('load', function(){
       this.width = 800;
       this.height = 434;
       this.x = 0;
-      this.y = -20;
+      this.y = -15;
       this.image = document.querySelector(".wall");
     }
     draw(context){
@@ -604,7 +605,7 @@ window.addEventListener('load', function(){
       this.width = 254;
       this.height = 49;
       this.x = 390;
-      this.y = 3;
+      this.y = 9;
       this.image = document.querySelector(".gamebar");
     }
     draw(context){
@@ -657,8 +658,8 @@ window.addEventListener('load', function(){
     constructor(){
       this.colorStars = 'lightyellow';
       this.starNum = 120;
-      this.size = 0.005;
-      this.speed = 0.05; 
+      this.size = 0.0025;
+      this.speed = 0.03; 
     }
     update(){
       for (let i = 0; i < star.starNum; i++) {
@@ -752,6 +753,8 @@ window.addEventListener('load', function(){
       currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
     } else if (currentMinute >= 10 && currentSecond >= 10 && currentHour <= 10) {
       currentTime = "0" + currentHour + ":" + currentMinute + ":" + currentSecond;
+    } else if (currentMinute < 10 && currentSecond >= 10 && currentHour < 10) {
+      currentTime = "0" + currentHour + ":0" + currentMinute + ":" + currentSecond;
     } else {
       currentTime = currentHour + ":" + currentMinute + ":" + currentSecond;
     }
@@ -761,7 +764,7 @@ window.addEventListener('load', function(){
   function clock() {
     ctx.fillStyle = "white";
     ctx.font = "30px Courier";
-    ctx.fillText(currentTime, 440, 37);
+    ctx.fillText(currentTime, 442, 43);
   };
 
   //CANNOT FADE BETWEEN GRADIENTS FOR SOME REASON

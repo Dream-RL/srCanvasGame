@@ -300,7 +300,8 @@ window.addEventListener('load', function(){
     {
       name: "Mumbai",
       country: "India",
-      time: +5,
+      //*time needs to be 1 hour ahead to account for 30 minute difference
+      time: +6,
       minute: 30,
       daylightSavings: 1,
       rain: 90,
@@ -321,7 +322,8 @@ window.addEventListener('load', function(){
     {
       name: "Tehran",
       country: "Iran",
-      time: +4,
+      //*time needs to be 1 hour ahead to account for 30 minute difference
+      time: +5,
       minute: 30,
       daylightSavings: 1,
       rain: 61,
@@ -413,20 +415,19 @@ window.addEventListener('load', function(){
     },
   ];
     
-  //* LOCATION
-  let nftName = "Berlin";
+  //* SET LOCATION
+  let nftName = "Mumbai";
 
-  //* CANVAS
+  //# CANVAS
   const canvas = document.getElementById("Canvas");
   const ctx = canvas.getContext("2d");
   canvas.width = 800;
   canvas.height = 500;
   
-  //* VARIABLES
+  //# VARIABLES
   let currentHour;
   let currentMinute;
   let currentSecond;
-  let milliseconds;
   let currentMonth;
   let currentTime;
   let morning;
@@ -442,10 +443,10 @@ window.addEventListener('load', function(){
   let yv;
   let lastTime = 0;
   let weatherTimer = 0;
-  let weatherInterval = 10000;
+  let weatherInterval = 300000;
   let deltaTime = 0;
 
-  //* OPERATIONS
+  //# OPERATIONS
   const index = Countries.findIndex((object) => {
     return object.name === nftName;
   });
@@ -455,7 +456,7 @@ window.addEventListener('load', function(){
     sleep: Math.floor(Math.random() * 60) + 1,
   };
 
-  //* CLASSES
+  //# CLASSES
   class InputHandler {
     constructor(){
       this.keys = [];
@@ -621,12 +622,14 @@ window.addEventListener('load', function(){
         currentTime = "0" + currentHour + ":0" + currentMinute + ":0" + currentSecond;
       } else if (currentMinute >= 10 && currentSecond < 10 && currentHour >= 10) {
         currentTime = currentHour + ":" + currentMinute + ":0" + currentSecond;
-      } else if (currentMinute >= 10 && currentSecond < 10 && currentHour <= 10) {
+      } else if (currentMinute >= 10 && currentSecond < 10 && currentHour >= 10) {
         currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
       } else if (currentMinute >= 10 && currentSecond >= 10 && currentHour <= 10) {
         currentTime = "0" + currentHour + ":" + currentMinute + ":" + currentSecond;
       } else if (currentMinute < 10 && currentSecond >= 10 && currentHour < 10) {
         currentTime = "0" + currentHour + ":0" + currentMinute + ":" + currentSecond;
+      } else if (currentMinute >= 10 && currentSecond < 10 && currentHour < 10) {
+        currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
       } else {
         currentTime = currentHour + ":" + currentMinute + ":" + currentSecond;
       };
@@ -715,9 +718,7 @@ window.addEventListener('load', function(){
     }
   };
 
-  //* FUNCTIONS
-  //! MUMBAI/TEHRAN - MINUTES START AT 30 AND END AT 90
-  //! CLOCK
+  //# FUNCTIONS
   function time() {
     date = new Date();
     currentHour = date.getUTCHours() + Countries[index].time;
@@ -725,25 +726,31 @@ window.addEventListener('load', function(){
     currentSecond = date.getUTCSeconds();
     milliseconds = date.getUTCMilliseconds();
     currentMonth = date.getMonth();
+    let tempMinute;
 
     //*add 30 minutes to countries that need it
     if (
       Countries[index].name == "Tehran" ||
       Countries[index].name == "Mumbai"
     ) {
-      currentMinute = date.getUTCMinutes() + Countries[index].minute;
+      tempMinute = date.getUTCMinutes() + Countries[index].minute;
+      if (tempMinute >= 61) {
+        currentMinute = tempMinute - 60;
+      } else {
+        currentMinute = tempMinute;
+      }
     } 
     //*countries that do not need 30 minutes added 
     else {
       currentMinute = date.getUTCMinutes();
     }
     //*make sure time doesn't go above 24 hours of the day
-    if (currentHour > 24) {
+    if (currentHour >= 24) {
       // console.log("time greater than 24");
       currentHour = currentHour - 24;
     }
     //*make sure time doesn't go bellow 1 hours of the day
-    if (currentHour < 1) {
+    if (currentHour < 1 && currentHour !== 0) {
       // console.log("time less than 1");
       currentHour = currentHour + 24;
     }
@@ -888,9 +895,14 @@ window.addEventListener('load', function(){
     } else {
       tableCollided = false;
     }
-  }
+  };
 
-  //* BUILD GAME
+  //# EVENT LISTENERS
+  document.addEventListener("click", (event) => {
+    handleClick(event);
+  });
+
+  //# INITIALIZE CLASS OBJECTS
   const input = new InputHandler();
   const player = new Player();
   const bed = new Bed();
@@ -901,17 +913,14 @@ window.addEventListener('load', function(){
   const scenery = new Scenery();
   const clock = new Clock();
   const star = new Stars();
-
   const snowArray = [];
   for (let i = 0; i < 100; i++){
       snowArray.push(new Snowflake);
   };
-
   const rainArray = [];
   for (let i = 0; i < 75; i++){
       rainArray.push(new Raindrop);
   };
-
   const stars = [];
   for (let i = 0; i < star.starNum; i++) {
       let speedMult = Math.random() * 1.5 + 0.5;
@@ -924,8 +933,7 @@ window.addEventListener('load', function(){
       }
   }
  
-  weather();
-
+  //# CALL ON LOAD
   function animate(timeStamp) {
     //*track time between animation frames
     deltaTime = timeStamp - lastTime;
@@ -954,12 +962,9 @@ window.addEventListener('load', function(){
     clock.draw(ctx);
     player.update(input);
 
-    requestAnimationFrame(animate)
+    requestAnimationFrame(animate);
   }
-  animate(0);
 
-  //EVENT LISTENERS
-  document.addEventListener("click", (event) => {
-    handleClick(event);
-  });
+  weather();
+  animate(0);
 });

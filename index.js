@@ -414,7 +414,7 @@ window.addEventListener('load', function(){
   ];
     
   //LOCATION
-  let nftName = "Yellowknife";
+  let nftName = "Los Angeles";
 
   //CANVAS
   const canvas = document.getElementById("Canvas");
@@ -438,7 +438,7 @@ window.addEventListener('load', function(){
   let yv = 0;
   let lastTime = 0;
   let weatherTimer = 0;
-  let weatherInterval = 10000;
+  let weatherInterval = 60000;
   let deltaTime = 0;
 
   //OPERATIONS
@@ -599,6 +599,19 @@ window.addEventListener('load', function(){
     }
   };
 
+  class Gamebar {
+    constructor(){
+      this.width = 407;
+      this.height = 49;
+      this.x = 15;
+      this.y = 15;
+      this.image = document.querySelector(".gamebar");
+    }
+    draw(context){
+      context.drawImage(this.image, this.x, this.y, this.width, this.height);
+    }
+  };
+
   class Snowflake {
     //NEED TO SPLICE OUT OF ARRAY INSTEAD OF REUSING PARTICLES TO END CLEANLY
     constructor(){
@@ -727,24 +740,28 @@ window.addEventListener('load', function(){
     }
 
     //adds a zero to the minutes and seconds if below 10
-    if (currentMinute < 10 && currentSecond >= 10) {
+    if (currentMinute < 10 && currentSecond >= 10 && currentHour >= 10) {
       currentTime = currentHour + ":0" + currentMinute + ":" + currentSecond;
-    } else if (currentMinute < 10 && currentSecond < 10) {
+    } else if (currentMinute < 10 && currentSecond < 10 && currentHour >= 10) {
       currentTime = currentHour + ":0" + currentMinute + ":0" + currentSecond;
-    } else if (currentMinute >= 10 && currentSecond < 10) {
+    } else if (currentMinute < 10 && currentSecond < 10 && currentHour < 10) {
+      currentTime = "0" + currentHour + ":0" + currentMinute + ":0" + currentSecond;
+    } else if (currentMinute >= 10 && currentSecond < 10 && currentHour >= 10) {
       currentTime = currentHour + ":" + currentMinute + ":0" + currentSecond;
+    } else if (currentMinute >= 10 && currentSecond < 10 && currentHour <= 10) {
+      currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
+    } else if (currentMinute >= 10 && currentSecond > 10 && currentHour <= 10) {
+      currentTime = "0" + currentHour + ":" + currentMinute + ":" + currentSecond;
     } else {
       currentTime = currentHour + ":" + currentMinute + ":" + currentSecond;
     }
+
   };
 
   function clock() {
-    ctx.fillStyle = "black";
-    ctx.font = "20px Verdana";
-    ctx.fillText(currentTime, 10, 55);
-    // for testing
-    // ctx.fillText("player x: " + player.x, 10, 25);
-    ctx.fillText(nftName, 10, 25);
+    ctx.fillStyle = "white";
+    ctx.font = "30px Courier";
+    ctx.fillText(currentTime, 225, 50);
   };
 
   //CANNOT FADE BETWEEN GRADIENTS FOR SOME REASON
@@ -847,14 +864,16 @@ window.addEventListener('load', function(){
   };
 
   function handleCollisions() {
-    if (player.x <= 150) {
+    //bed collision
+    if (player.x <= 270) {
       bedCollided = true;
       // console.log("Bed collided.");
     } else {
       bedCollided = false;
     }
 
-    if (player.x >= 285) {
+    //table collision
+    if (player.x >= 410) {
       tableCollided = true;
       // console.log("Table collided.");
     } else {
@@ -871,6 +890,7 @@ window.addEventListener('load', function(){
   const floor = new Floor();
   const wall = new Wall();
   const scenery = new Scenery();
+  const gamebar = new Gamebar();
   const star = new Stars();
 
   const snowArray = [];
@@ -931,6 +951,7 @@ window.addEventListener('load', function(){
     table.draw(ctx);
     food.draw(ctx);
     player.draw(ctx);
+    gamebar.draw(ctx);
     clock();
     player.update(input);
 

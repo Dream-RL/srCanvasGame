@@ -413,36 +413,39 @@ window.addEventListener('load', function(){
     },
   ];
     
-  //LOCATION
-  //PROBLEM WITH MUMBAI - MINUTES START AT 30 AND END AT 90
-  let nftName = "Kyiv";
+  //* LOCATION
+  let nftName = "Berlin";
 
-  //CANVAS
+  //* CANVAS
   const canvas = document.getElementById("Canvas");
   const ctx = canvas.getContext("2d");
   canvas.width = 800;
   canvas.height = 500;
   
-  //VARIABLES
-  let currentHour = 0;
-  let currentMinute = 0;
-  let currentSecond = 0;
-  let milliseconds =  0;
-  let currentMonth = 0;
-  let currentTime = "";
-  let raining = true;
-  let snowing = true;
-  let sunny = true;
-  let bedCollided = false;
-  let tableCollided = false;
-  let xv = 0;
-  let yv = 0;
+  //* VARIABLES
+  let currentHour;
+  let currentMinute;
+  let currentSecond;
+  let milliseconds;
+  let currentMonth;
+  let currentTime;
+  let morning;
+  let dayTime;
+  let evening;
+  let nightTime;
+  let raining;
+  let snowing;
+  let sunny;
+  let bedCollided;
+  let tableCollided;
+  let xv;
+  let yv;
   let lastTime = 0;
   let weatherTimer = 0;
-  let weatherInterval = 60000;
+  let weatherInterval = 10000;
   let deltaTime = 0;
 
-  //OPERATIONS
+  //* OPERATIONS
   const index = Countries.findIndex((object) => {
     return object.name === nftName;
   });
@@ -452,7 +455,7 @@ window.addEventListener('load', function(){
     sleep: Math.floor(Math.random() * 60) + 1,
   };
 
-  //CLASSES
+  //* CLASSES
   class InputHandler {
     constructor(){
       this.keys = [];
@@ -600,16 +603,38 @@ window.addEventListener('load', function(){
     }
   };
 
-  class Gamebar {
+  class Clock {
     constructor(){
       this.width = 254;
       this.height = 49;
       this.x = 390;
       this.y = 9;
-      this.image = document.querySelector(".gamebar");
+      this.image = document.querySelector(".clock");
     }
     draw(context){
+      //*adds a zero to the minutes, seconds, and hour if below 10
+      if (currentMinute < 10 && currentSecond >= 10 && currentHour >= 10) {
+        currentTime = currentHour + ":0" + currentMinute + ":" + currentSecond;
+      } else if (currentMinute < 10 && currentSecond < 10 && currentHour >= 10) {
+        currentTime = currentHour + ":0" + currentMinute + ":0" + currentSecond;
+      } else if (currentMinute < 10 && currentSecond < 10 && currentHour < 10) {
+        currentTime = "0" + currentHour + ":0" + currentMinute + ":0" + currentSecond;
+      } else if (currentMinute >= 10 && currentSecond < 10 && currentHour >= 10) {
+        currentTime = currentHour + ":" + currentMinute + ":0" + currentSecond;
+      } else if (currentMinute >= 10 && currentSecond < 10 && currentHour <= 10) {
+        currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
+      } else if (currentMinute >= 10 && currentSecond >= 10 && currentHour <= 10) {
+        currentTime = "0" + currentHour + ":" + currentMinute + ":" + currentSecond;
+      } else if (currentMinute < 10 && currentSecond >= 10 && currentHour < 10) {
+        currentTime = "0" + currentHour + ":0" + currentMinute + ":" + currentSecond;
+      } else {
+        currentTime = currentHour + ":" + currentMinute + ":" + currentSecond;
+      };
+
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
+      ctx.fillStyle = "white";
+      ctx.font = "30px Courier";
+      ctx.fillText(currentTime, 442, 43);
     }
   };
 
@@ -690,7 +715,9 @@ window.addEventListener('load', function(){
     }
   };
 
-  //FUNCTIONS
+  //* FUNCTIONS
+  //! MUMBAI/TEHRAN - MINUTES START AT 30 AND END AT 90
+  //! CLOCK
   function time() {
     date = new Date();
     currentHour = date.getUTCHours() + Countries[index].time;
@@ -699,25 +726,28 @@ window.addEventListener('load', function(){
     milliseconds = date.getUTCMilliseconds();
     currentMonth = date.getMonth();
 
+    //*add 30 minutes to countries that need it
     if (
       Countries[index].name == "Tehran" ||
       Countries[index].name == "Mumbai"
     ) {
       currentMinute = date.getUTCMinutes() + Countries[index].minute;
-    } else {
+    } 
+    //*countries that do not need 30 minutes added 
+    else {
       currentMinute = date.getUTCMinutes();
     }
-    // make sure time doesn't go above 24 hours of the day
+    //*make sure time doesn't go above 24 hours of the day
     if (currentHour > 24) {
       // console.log("time greater than 24");
       currentHour = currentHour - 24;
     }
-    // make sure time doesn't go bellow 1 hours of the day
+    //*make sure time doesn't go bellow 1 hours of the day
     if (currentHour < 1) {
       // console.log("time less than 1");
       currentHour = currentHour + 24;
     }
-    //set daytime variable
+    //*set time of day variable
     if (currentHour >= 6 && currentHour < 8) {
       morning = true;
       dayTime = false;
@@ -739,36 +769,49 @@ window.addEventListener('load', function(){
       evening = false;
       nightTime = true;
     }
+  };
 
-    //adds a zero to the minutes and seconds if below 10
-    if (currentMinute < 10 && currentSecond >= 10 && currentHour >= 10) {
-      currentTime = currentHour + ":0" + currentMinute + ":" + currentSecond;
-    } else if (currentMinute < 10 && currentSecond < 10 && currentHour >= 10) {
-      currentTime = currentHour + ":0" + currentMinute + ":0" + currentSecond;
-    } else if (currentMinute < 10 && currentSecond < 10 && currentHour < 10) {
-      currentTime = "0" + currentHour + ":0" + currentMinute + ":0" + currentSecond;
-    } else if (currentMinute >= 10 && currentSecond < 10 && currentHour >= 10) {
-      currentTime = currentHour + ":" + currentMinute + ":0" + currentSecond;
-    } else if (currentMinute >= 10 && currentSecond < 10 && currentHour <= 10) {
-      currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
-    } else if (currentMinute >= 10 && currentSecond >= 10 && currentHour <= 10) {
-      currentTime = "0" + currentHour + ":" + currentMinute + ":" + currentSecond;
-    } else if (currentMinute < 10 && currentSecond >= 10 && currentHour < 10) {
-      currentTime = "0" + currentHour + ":0" + currentMinute + ":" + currentSecond;
-    } else {
-      currentTime = currentHour + ":" + currentMinute + ":" + currentSecond;
+  //*determine which type of weather will happen
+  function weather() {
+
+    let chance = Math.floor(Math.random() * 365) + 1;
+    let rainChance = Countries[index].rain - Countries[index].snow;
+
+    //*rain
+    if (chance < rainChance) {
+      console.log("Raining");
+      handleOutside();
+      raining = true;
+      snowing = false;
+      sunny = false;
+    } 
+    //*snowing
+    else if (
+      chance > rainChance &&
+      chance < rainChance + Countries[index].snow
+    ) {
+      console.log("Snowing");
+      handleOutside();
+      snowing = true;
+      sunny = false;
+      raining = false;
+    } 
+    //*sunny/clear
+    else if (
+      chance > rainChance &&
+      chance > rainChance + Countries[index].snow
+    ) {
+      console.log("Sunny");
+      sunny = true;
+      snowing = false;
+      raining = false;
     }
-
   };
 
-  function clock() {
-    ctx.fillStyle = "white";
-    ctx.font = "30px Courier";
-    ctx.fillText(currentTime, 442, 43);
-  };
-
-  //CANNOT FADE BETWEEN GRADIENTS FOR SOME REASON
-  function defaultSky() {
+  //*draw everything outside the window including rain and snow
+  //! CANNOT FADE BETWEEN GRADIENTS FOR SOME REASON
+  function handleOutside() {
+    //*draw sky gradient
     if (morning === true && raining === true) {
       canvas.style.background = "linear-gradient(#1F6064, #E8AE56)";
     } else if (dayTime === true && raining === true) {
@@ -793,72 +836,34 @@ window.addEventListener('load', function(){
       canvas.style.background = "linear-gradient(#E8AE56, #D3FFFF)";
     } else if (nightTime === true && sunny === true) {
       canvas.style.background = "linear-gradient(#0D0627, #000000)";
-    }
+    };
+
+    //*draw stars
+    if (nightTime == true) {
+      star.draw(canvas);
+      star.update();
+    };
+    
+    //*draw scenery
+    scenery.draw(ctx);
+
+    //*draw and update rain and snow
+    if (raining == true) {
+      for (let i = 0; i < rainArray.length; i++) {
+      rainArray[i].update();
+      rainArray[i].draw(canvas);
+      }
+    } else if (snowing == true) {
+      for (let i = 0; i < snowArray.length; i++) {
+      snowArray[i].update();
+      snowArray[i].draw(canvas);
+      }
+    };
+
+
   };
 
-  function weather() {
-    let chance = Math.floor(Math.random() * 365) + 1;
-    let rainChance = Countries[index].rain - Countries[index].snow;
-    if (chance < rainChance) {
-    //console.log(chance + " < " + rainChance);
-      console.log("Raining");
-      handleRaindrop(canvas);
-      raining = true;
-      snowing = false;
-      sunny = false;
-    } else if (
-      chance > rainChance &&
-      chance < rainChance + Countries[index].snow
-    ) {
-    //   console.log(
-    //     chance +
-    //       " > " +
-    //       rainChance +
-    //       "&&" +
-    //       chance +
-    //       " < " +
-    //       rainChance +
-    //       Countries[index].snow
-    //   );
-      console.log("Snowing");
-      handleSnowflakes(canvas);
-      snowing = true;
-      sunny = false;
-      raining = false;
-    } else if (
-      chance > rainChance &&
-      chance > rainChance + Countries[index].snow
-    ) {
-      console.log("Sunny");
-      // console.log(
-      //   chance +
-      //     " > " +
-      //     rainChance +
-      //     " && " +
-      //     chance +
-      //     " > " +
-      //     (rainChance + Countries[index].snow)
-      // );
-      sunny = true;
-      snowing = false;
-      raining = false;
-    }
-  };
-
-  function handleSnowflakes(canvas){
-    for (let i = 0; i < snowArray.length; i++) {
-    snowArray[i].update();
-    snowArray[i].draw(canvas);
-    }
-  };
-
-  function handleRaindrop(canvas){
-    for (let i = 0; i < rainArray.length; i++) {
-    rainArray[i].update();
-    rainArray[i].draw(canvas);
-    }
-  };
-
+  //* handle click event
   function handleClick(event) {
     let bound = canvas.getBoundingClientRect();
     let x = event.clientX - bound.left - canvas.clientLeft;
@@ -866,8 +871,9 @@ window.addEventListener('load', function(){
     console.log("clicked X:" + x + " Y:" + y);
   };
 
+  //*handle collisions with the bed and table
   function handleCollisions() {
-    //bed collision
+    //*bed collision
     if (player.x <= 270) {
       bedCollided = true;
       // console.log("Bed collided.");
@@ -875,7 +881,7 @@ window.addEventListener('load', function(){
       bedCollided = false;
     }
 
-    //table collision
+    //*table collision
     if (player.x >= 410) {
       tableCollided = true;
       // console.log("Table collided.");
@@ -884,7 +890,7 @@ window.addEventListener('load', function(){
     }
   }
 
-  //BUILD GAME
+  //* BUILD GAME
   const input = new InputHandler();
   const player = new Player();
   const bed = new Bed();
@@ -893,7 +899,7 @@ window.addEventListener('load', function(){
   const floor = new Floor();
   const wall = new Wall();
   const scenery = new Scenery();
-  const gamebar = new Gamebar();
+  const clock = new Clock();
   const star = new Stars();
 
   const snowArray = [];
@@ -921,41 +927,31 @@ window.addEventListener('load', function(){
   weather();
 
   function animate(timeStamp) {
+    //*track time between animation frames
     deltaTime = timeStamp - lastTime;
     lastTime = timeStamp;
+
     ctx.clearRect(0,0,canvas.width,canvas.height);
     time();
     handleCollisions();
-    defaultSky();
 
-    if (nightTime == true) {
-      star.draw(canvas);
-      star.update();
-    }
-    
-    scenery.draw(ctx);
-
+    //*call weather function when the weatherInterval has passed
     if (weatherTimer > weatherInterval) {
       weather();
       weatherTimer = 0;
     } else {
       weatherTimer += deltaTime;
-    }
-
-    if (raining == true) {
-      handleRaindrop(canvas);
-    } else if (snowing == true) {
-      handleSnowflakes(canvas);
-    }
-    
+    };
+   
+    //*draw and update all of the visual elements on screen
+    handleOutside();
     wall.draw(ctx);
     floor.draw(ctx);
     bed.draw(ctx);
     table.draw(ctx);
     food.draw(ctx);
     player.draw(ctx);
-    gamebar.draw(ctx);
-    clock();
+    clock.draw(ctx);
     player.update(input);
 
     requestAnimationFrame(animate)

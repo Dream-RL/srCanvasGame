@@ -601,10 +601,10 @@ window.addEventListener('load', function(){
 
   class Gamebar {
     constructor(){
-      this.width = 407;
+      this.width = 254;
       this.height = 49;
-      this.x = 15;
-      this.y = 15;
+      this.x = 390;
+      this.y = 3;
       this.image = document.querySelector(".gamebar");
     }
     draw(context){
@@ -750,7 +750,7 @@ window.addEventListener('load', function(){
       currentTime = currentHour + ":" + currentMinute + ":0" + currentSecond;
     } else if (currentMinute >= 10 && currentSecond < 10 && currentHour <= 10) {
       currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
-    } else if (currentMinute >= 10 && currentSecond > 10 && currentHour <= 10) {
+    } else if (currentMinute >= 10 && currentSecond >= 10 && currentHour <= 10) {
       currentTime = "0" + currentHour + ":" + currentMinute + ":" + currentSecond;
     } else {
       currentTime = currentHour + ":" + currentMinute + ":" + currentSecond;
@@ -761,7 +761,7 @@ window.addEventListener('load', function(){
   function clock() {
     ctx.fillStyle = "white";
     ctx.font = "30px Courier";
-    ctx.fillText(currentTime, 225, 50);
+    ctx.fillText(currentTime, 440, 37);
   };
 
   //CANNOT FADE BETWEEN GRADIENTS FOR SOME REASON

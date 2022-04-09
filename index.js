@@ -300,8 +300,7 @@ window.addEventListener('load', function(){
     {
       name: "Mumbai",
       country: "India",
-      //*time needs to be 1 hour ahead to account for 30 minute difference
-      time: +6,
+      time: +5,
       minute: 30,
       daylightSavings: 1,
       rain: 90,
@@ -322,8 +321,7 @@ window.addEventListener('load', function(){
     {
       name: "Tehran",
       country: "Iran",
-      //*time needs to be 1 hour ahead to account for 30 minute difference
-      time: +5,
+      time: +4,
       minute: 30,
       daylightSavings: 1,
       rain: 61,
@@ -448,7 +446,7 @@ window.addEventListener('load', function(){
 
   //# OPERATIONS
   const index = Countries.findIndex((object) => {
-    return object.name === nftName;
+    return object.name == nftName;
   });
 
   const ranNums = {
@@ -614,30 +612,57 @@ window.addEventListener('load', function(){
     }
     draw(context){
       //*adds a zero to the minutes, seconds, and hour if below 10
-      if (currentMinute < 10 && currentSecond >= 10 && currentHour >= 10) {
+      if (currentMinute < 10 
+      && currentSecond >= 10 
+      && currentHour >= 10
+      ){
         currentTime = currentHour + ":0" + currentMinute + ":" + currentSecond;
-      } else if (currentMinute < 10 && currentSecond < 10 && currentHour >= 10) {
+      } else if (currentMinute < 10 
+      && currentSecond < 10 
+      && currentHour >= 10
+      ){
         currentTime = currentHour + ":0" + currentMinute + ":0" + currentSecond;
-      } else if (currentMinute < 10 && currentSecond < 10 && currentHour < 10) {
+      } else if (currentMinute < 10 
+      && currentSecond < 10 
+      && currentHour < 10
+      ){
         currentTime = "0" + currentHour + ":0" + currentMinute + ":0" + currentSecond;
-      } else if (currentMinute >= 10 && currentSecond < 10 && currentHour >= 10) {
+      } else if (currentMinute >= 10 
+      && currentSecond < 10 
+      && currentHour >= 10
+      ){
         currentTime = currentHour + ":" + currentMinute + ":0" + currentSecond;
-      } else if (currentMinute >= 10 && currentSecond < 10 && currentHour >= 10) {
+      } else if (currentMinute >= 10 
+      && currentSecond < 10 
+      && currentHour >= 10
+      ){
         currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
-      } else if (currentMinute >= 10 && currentSecond >= 10 && currentHour <= 10) {
+      } else if (currentMinute >= 10 
+      && currentSecond >= 10 
+      && currentHour <= 10
+      ){
         currentTime = "0" + currentHour + ":" + currentMinute + ":" + currentSecond;
-      } else if (currentMinute < 10 && currentSecond >= 10 && currentHour < 10) {
+      } else if (currentMinute < 10 
+      && currentSecond >= 10 
+      && currentHour < 10
+      ){
         currentTime = "0" + currentHour + ":0" + currentMinute + ":" + currentSecond;
-      } else if (currentMinute >= 10 && currentSecond < 10 && currentHour < 10) {
+      } else if (currentMinute >= 10 
+      && currentSecond < 10 
+      && currentHour < 10
+      ){
         currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
       } else {
         currentTime = currentHour + ":" + currentMinute + ":" + currentSecond;
       };
 
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
-      ctx.fillStyle = "white";
-      ctx.font = "30px Courier";
-      ctx.fillText(currentTime, 442, 43);
+      ctx.fillStyle = "#FFAC12";
+      ctx.font = "30px Consolas";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 3;
+      ctx.strokeText(currentTime, 452, 43);
+      ctx.fillText(currentTime, 451.5, 43);
     }
   };
 
@@ -726,18 +751,19 @@ window.addEventListener('load', function(){
     currentSecond = date.getUTCSeconds();
     milliseconds = date.getUTCMilliseconds();
     currentMonth = date.getMonth();
-    let tempMinute;
+    let adjustedMinute;
 
-    //*add 30 minutes to countries that need it
+    //*handle time for countries that are 30 minutes ahead
     if (
       Countries[index].name == "Tehran" ||
       Countries[index].name == "Mumbai"
     ) {
-      tempMinute = date.getUTCMinutes() + Countries[index].minute;
-      if (tempMinute >= 61) {
-        currentMinute = tempMinute - 60;
+      adjustedMinute = date.getUTCMinutes() + Countries[index].minute;
+      //*stops minutes from going over 60
+      if (adjustedMinute >= 61) {
+        currentMinute = adjustedMinute - 60;
       } else {
-        currentMinute = tempMinute;
+        currentMinute = adjustedMinute;
       }
     } 
     //*countries that do not need 30 minutes added 
@@ -754,13 +780,13 @@ window.addEventListener('load', function(){
       // console.log("time less than 1");
       currentHour = currentHour + 24;
     }
-    //*set time of day variable
-    if (currentHour >= 6 && currentHour < 8) {
+    //*set time of day variables
+    if (currentHour == 6) {
       morning = true;
       dayTime = false;
       evening = false;
       nightTime = false;
-    } else if (currentHour >= 8 && currentHour < 18) {
+    } else if (currentHour >= 7 && currentHour < 18) {
       morning = false;
       dayTime = true;
       evening = false;
@@ -787,7 +813,7 @@ window.addEventListener('load', function(){
     //*rain
     if (chance < rainChance) {
       console.log("Raining");
-      handleOutside();
+      handleBackground();
       raining = true;
       snowing = false;
       sunny = false;
@@ -798,7 +824,7 @@ window.addEventListener('load', function(){
       chance < rainChance + Countries[index].snow
     ) {
       console.log("Snowing");
-      handleOutside();
+      handleBackground();
       snowing = true;
       sunny = false;
       raining = false;
@@ -815,33 +841,34 @@ window.addEventListener('load', function(){
     }
   };
 
+  //TODO figure out transition for background gradient
+  //TODO would be nice to have rain/snow/stars transition in when called
   //*draw everything outside the window including rain and snow
-  //! CANNOT FADE BETWEEN GRADIENTS FOR SOME REASON
-  function handleOutside() {
+  function handleBackground() {
     //*draw sky gradient
-    if (morning === true && raining === true) {
+    if (morning == true && raining == true) {
       canvas.style.background = "linear-gradient(#1F6064, #E8AE56)";
-    } else if (dayTime === true && raining === true) {
+    } else if (dayTime == true && raining == true) {
       canvas.style.background = "linear-gradient(#9BB9B8, #3F8F93)";
-    } else if (evening === true && raining === true) {
+    } else if (evening == true && raining == true) {
       canvas.style.background = "linear-gradient(#9BB9B8, #1F6064)";
-    } else if (nightTime === true && raining === true) {
+    } else if (nightTime == true && raining == true) {
       canvas.style.background = "linear-gradient(#0D0627, #000000)";
-    } else if (morning === true && snowing === true) {
+    } else if (morning == true && snowing == true) {
       canvas.style.background = "linear-gradient(#31C4BF, #DAF8C3)";
-    } else if (dayTime === true && snowing === true) {
+    } else if (dayTime == true && snowing == true) {
       canvas.style.background = "linear-gradient(#CCFFFD, #31C4BF)";
-    } else if (evening === true && snowing === true) {
+    } else if (evening == true && snowing == true) {
       canvas.style.background = "linear-gradient(#DAF8C3, #31C4BF)";
-    } else if (nightTime === true && snowing === true) {
+    } else if (nightTime == true && snowing == true) {
       canvas.style.background = "linear-gradient(#0D0627, #000000)";
-    } else if (morning === true && sunny === true) {
+    } else if (morning == true && sunny == true) {
       canvas.style.background = "linear-gradient(#31C4BF, #E8AE56)";
-    } else if (dayTime === true && sunny === true) {
+    } else if (dayTime == true && sunny == true) {
       canvas.style.background = "linear-gradient(#D3FFFF, #56E7E7)";
-    } else if (evening === true && sunny === true) {
+    } else if (evening == true && sunny == true) {
       canvas.style.background = "linear-gradient(#E8AE56, #D3FFFF)";
-    } else if (nightTime === true && sunny === true) {
+    } else if (nightTime == true && sunny == true) {
       canvas.style.background = "linear-gradient(#0D0627, #000000)";
     };
 
@@ -952,7 +979,7 @@ window.addEventListener('load', function(){
     };
    
     //*draw and update all of the visual elements on screen
-    handleOutside();
+    handleBackground();
     wall.draw(ctx);
     floor.draw(ctx);
     bed.draw(ctx);

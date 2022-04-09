@@ -47,6 +47,14 @@ window.addEventListener('load', function(){
       rain: 34,
       snow: 0,
       sun: 186,
+      winter: [0, 1, 11],
+      spring: [2, 3, 4],
+      summer: [5, 6, 7],
+      fall: [8, 9, 10],
+      winterWeather: "wet",
+      springWeather: "dry",
+      summerWeather: "dry",
+      fallWeather: "wet",
     },
     {
       name: "Denver",
@@ -411,10 +419,15 @@ window.addEventListener('load', function(){
   //CANVAS
   const canvas = document.getElementById("Canvas");
   const ctx = canvas.getContext("2d");
-  canvas.width = 600;
-  canvas.height = 360;
+  canvas.width = 800;
+  canvas.height = 500;
   
   //VARIABLES
+  let currentHour = 0;
+  let currentMinute = 0;
+  let currentSecond = 0;
+  let milliseconds =  0;
+  let currentMonth = 0;
   let currentTime = "";
   let raining = true;
   let snowing = true;
@@ -465,13 +478,11 @@ window.addEventListener('load', function(){
   };
 
   class Player {
-    constructor(gameWidth, gameHeight){
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-      this.width = 178;
-      this.height = 196;
+    constructor(){
+      this.width = 244;
+      this.height = 271;
       this.x = Math.floor(Math.random() * 399) + 51;
-      this.y = 155;
+      this.y = 400;
       this.image = document.querySelector(".player");
       this.speed = 0;
       this.vy = 0;
@@ -493,7 +504,7 @@ window.addEventListener('load', function(){
       //horizontal movement
       this.x += this.speed;
       if (this.x < 0) this.x = 0;
-      else if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
+      else if (this.x > canvas.width - this.width) this.x = canvas.width - this.width;
       //vertical movement
       this.y += this.vy;
       if (!this.onGround()){
@@ -501,21 +512,21 @@ window.addEventListener('load', function(){
       } else {
           this.vy = 0;
       }
-      if (this.y > 155) this.y = 155;
+      if (this.y > 210) this.y = 210;
     }
     onGround(){
-      return this.y >= 155;
+      return this.y >= 210;
     }
   };
 
   class Bed {
-    constructor(gameWidth, gameHeight){
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-      this.width = 194;
-      this.height = 125;
+    constructor(){
+      canvas.width = canvas.width;
+      canvas.height = canvas.height;
+      this.width = 321;
+      this.height = 207;
       this.x = 0;
-      this.y = 220;
+      this.y = 270;
       this.image = document.querySelector(".bed");
     }
     draw(context){
@@ -524,13 +535,11 @@ window.addEventListener('load', function(){
   };
 
   class Table {
-    constructor(gameWidth, gameHeight){
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-      this.width = 187;
-      this.height = 125;
-      this.x = 413;
-      this.y = 220;
+    constructor(){
+      this.width = 223;
+      this.height = 140;
+      this.x = canvas.width - this.width;
+      this.y = 335;
       this.image = document.querySelector(".food");
     }
     draw(context){
@@ -539,13 +548,11 @@ window.addEventListener('load', function(){
   };
 
   class Food {
-    constructor(gameWidth, gameHeight){
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-      this.width = 76;
-      this.height = 66;
-      this.x = 495;
-      this.y = 195;
+    constructor(){
+      this.width = 106;
+      this.height = 93;
+      this.x = 650;
+      this.y = 285;
       this.image = document.querySelector(".foodToEat");
     }
     draw(context){
@@ -554,13 +561,11 @@ window.addEventListener('load', function(){
   };
 
   class Floor {
-    constructor(gameWidth, gameHeight){
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-      this.width = 600;
-      this.height = 89;
+    constructor(){
+      this.width = 800;
+      this.height = 129;
       this.x = 0;
-      this.y = 271;
+      this.y = canvas.height - this.height;
       this.image = document.querySelector(".floor");
     }
     draw(context){
@@ -569,13 +574,11 @@ window.addEventListener('load', function(){
   };
 
   class Wall {
-    constructor(gameWidth, gameHeight){
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-      this.width = 600;
-      this.height = 289;
+    constructor(){
+      this.width = 800;
+      this.height = 414;
       this.x = 0;
-      this.y = -10;
+      this.y = 0;
       this.image = document.querySelector(".wall");
     }
     draw(context){
@@ -584,12 +587,10 @@ window.addEventListener('load', function(){
   };
 
   class Scenery {
-    constructor(gameWidth, gameHeight){
-      this.gameWidth = gameWidth;
-      this.gameHeight = gameHeight;
-      this.width = 243;
-      this.height = 293;
-      this.x = 280;
+    constructor(){
+      this.width = 286;
+      this.height = 359;
+      this.x = 380;
       this.y = 0;
       this.image = document.querySelector(".scenery");
     }
@@ -601,7 +602,7 @@ window.addEventListener('load', function(){
   class Snowflake {
     //NEED TO SPLICE OUT OF ARRAY INSTEAD OF REUSING PARTICLES TO END CLEANLY
     constructor(){
-      this.x = Math.random() * 250 + 277;
+      this.x = Math.random() * 289 + 375;
       this.y = Math.random() * canvas.height;
       this.size = Math.random() * 4 + 0.5;
       this.speed = Math.random() * 0.5 + 0.2;
@@ -621,7 +622,7 @@ window.addEventListener('load', function(){
 
   class Raindrop {
     constructor(){
-      this.x = Math.random() * 250 + 277;
+      this.x = Math.random() * 289 + 375;
       this.y = Math.random() * canvas.height;
       this.size = Math.random() * 1.5 + 1;
       this.speed = Math.random() * 2 + 1.3;
@@ -651,15 +652,15 @@ window.addEventListener('load', function(){
       stars[i].x += 0.01;
       stars[i].y += 0.01;
 
-      if (stars[i].x < 275 - stars[i].r) {
-        stars[i].x = 525 + stars[i].r;
-      } else if (stars[i].x > 525 + stars[i].r) {
-          stars[i].x = 275 - stars[i].r;
+      if (stars[i].x < 377 - stars[i].r) {
+        stars[i].x = 662 + stars[i].r;
+      } else if (stars[i].x > 662 + stars[i].r) {
+          stars[i].x = 377 - stars[i].r;
       }
 
       if (stars[i].y < 0 - stars[i].r) {
-        stars[i].y = 270 + stars[i].r;
-      } else if (stars[i].y > 270 + stars[i].r) {
+        stars[i].y = 330 + stars[i].r;
+      } else if (stars[i].y > 330 + stars[i].r) {
         stars[i].y = 0 - stars[i].r;
       }
       }
@@ -677,11 +678,12 @@ window.addEventListener('load', function(){
 
   //FUNCTIONS
   function time() {
-    let date = new Date();
-    let currentHour = date.getUTCHours() + Countries[index].time;
-    let currentMinute = 0;
-    let currentSecond = date.getUTCSeconds();
-    let milliseconds = date.getUTCMilliseconds();
+    date = new Date();
+    currentHour = date.getUTCHours() + Countries[index].time;
+    currentMinute = 0;
+    currentSecond = date.getUTCSeconds();
+    milliseconds = date.getUTCMilliseconds();
+    currentMonth = date.getMonth();
 
     if (
       Countries[index].name == "Tehran" ||
@@ -736,7 +738,7 @@ window.addEventListener('load', function(){
     }
   };
 
-  function clock(canvas) {
+  function clock() {
     ctx.fillStyle = "black";
     ctx.font = "20px Verdana";
     ctx.fillText(currentTime, 10, 55);
@@ -745,6 +747,7 @@ window.addEventListener('load', function(){
     ctx.fillText(nftName, 10, 25);
   };
 
+  //CANNOT FADE BETWEEN GRADIENTS FOR SOME REASON
   function defaultSky() {
     if (morning === true && raining === true) {
       canvas.style.background = "linear-gradient(#1F6064, #E8AE56)";
@@ -773,7 +776,7 @@ window.addEventListener('load', function(){
     }
   };
 
-  function weather(deltaTime) {
+  function weather() {
     let chance = Math.floor(Math.random() * 365) + 1;
     let rainChance = Countries[index].rain - Countries[index].snow;
     if (chance < rainChance) {
@@ -861,14 +864,14 @@ window.addEventListener('load', function(){
 
   //BUILD GAME
   const input = new InputHandler();
-  const player = new Player(canvas.width, canvas.height);
-  const bed = new Bed(canvas.width, canvas.height);
-  const table = new Table(canvas.width, canvas.height);
-  const food = new Food(canvas.width, canvas.height);
-  const floor = new Floor(canvas.width, canvas.height);
-  const wall = new Wall(canvas.width, canvas.height);
-  const scenery = new Scenery(canvas.width, canvas.height);
-  const star = new Stars(canvas.width, canvas.height);
+  const player = new Player();
+  const bed = new Bed();
+  const table = new Table();
+  const food = new Food();
+  const floor = new Floor();
+  const wall = new Wall();
+  const scenery = new Scenery();
+  const star = new Stars();
 
   const snowArray = [];
   for (let i = 0; i < 100; i++){
@@ -885,14 +888,14 @@ window.addEventListener('load', function(){
       let speedMult = Math.random() * 1.5 + 0.5;
       stars[i] = {
           r: Math.random() * star.size * canvas.width / 2,
-          x: Math.floor(Math.random() * 250 + 275),
-          y: Math.floor(Math.random() * 270),
+          x: Math.floor(Math.random() * 289 + 375),
+          y: Math.floor(Math.random() * 330),
           xv: xv * speedMult,
           yv: yv * speedMult
       }
   }
  
-  weather(deltaTime);
+  weather();
 
   function animate(timeStamp) {
     deltaTime = timeStamp - lastTime;
@@ -910,7 +913,7 @@ window.addEventListener('load', function(){
     scenery.draw(ctx);
 
     if (weatherTimer > weatherInterval) {
-      weather(deltaTime);
+      weather();
       weatherTimer = 0;
     } else {
       weatherTimer += deltaTime;
@@ -928,7 +931,7 @@ window.addEventListener('load', function(){
     table.draw(ctx);
     food.draw(ctx);
     player.draw(ctx);
-    clock(canvas);
+    clock();
     player.update(input);
 
     requestAnimationFrame(animate)

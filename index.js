@@ -414,7 +414,7 @@ window.addEventListener('load', function(){
   ];
     
   //LOCATION
-  let nftName = "Los Angeles";
+  let nftName = "Vancouver";
 
   //CANVAS
   const canvas = document.getElementById("Canvas");
@@ -576,9 +576,9 @@ window.addEventListener('load', function(){
   class Wall {
     constructor(){
       this.width = 800;
-      this.height = 414;
+      this.height = 434;
       this.x = 0;
-      this.y = 0;
+      this.y = -20;
       this.image = document.querySelector(".wall");
     }
     draw(context){

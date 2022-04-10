@@ -414,13 +414,13 @@ window.addEventListener('load', function(){
   ];
     
   //* SET LOCATION
-  let nftName = "Mumbai";
+  let nftName = "Tokyo";
 
   //# CANVAS
   const canvas = document.getElementById("Canvas");
   const ctx = canvas.getContext("2d");
-  canvas.width = 800;
-  canvas.height = 500;
+  canvas.width = 1000;
+  canvas.height = 600;
   
   //# VARIABLES
   let currentHour;
@@ -439,6 +439,7 @@ window.addEventListener('load', function(){
   let tableCollided;
   let xv;
   let yv;
+  //*variable below must be set
   let lastTime = 0;
   let weatherTimer = 0;
   let weatherInterval = 300000;
@@ -482,14 +483,15 @@ window.addEventListener('load', function(){
 
   class Player {
     constructor(){
-      this.width = 244;
-      this.height = 271;
+      this.width = 276;
+      this.height = 305;
+      this.groundHeight = (canvas.height - this.height) - 25;
       this.x = Math.floor(Math.random() * 300) + 100;
-      this.y = 400;
+      this.y = this.groundHeight;
       this.image = document.querySelector(".player");
       this.speed = 0;
       this.vy = 0;
-      this.weight = 0.15;
+      this.weight = 0.12;
     };
     draw(context){
       context.drawImage(this.image, this.x, this.y);
@@ -504,21 +506,21 @@ window.addEventListener('load', function(){
       } else {
           this.speed = 0;
       }
-      //horizontal movement
+      //*horizontal movement
       this.x += this.speed;
       if (this.x < 0) this.x = 0;
       else if (this.x > canvas.width - this.width) this.x = canvas.width - this.width;
-      //vertical movement
+      //*vertical movement
       this.y += this.vy;
       if (!this.onGround()){
           this.vy += this.weight;
       } else {
           this.vy = 0;
       }
-      if (this.y > 210) this.y = 210;
+      if (this.y > this.groundHeight) this.y = this.groundHeight;
     }
     onGround(){
-      return this.y >= 210;
+      return this.y >= this.groundHeight;
     }
   };
 
@@ -526,8 +528,8 @@ window.addEventListener('load', function(){
     constructor(){
       canvas.width = canvas.width;
       canvas.height = canvas.height;
-      this.width = 321;
-      this.height = 207;
+      this.width = 377;
+      this.height = 247;
       this.x = 0;
       this.y = (canvas.height - this.height) - 25;
       this.image = document.querySelector(".bed");
@@ -539,8 +541,8 @@ window.addEventListener('load', function(){
 
   class Table {
     constructor(){
-      this.width = 223;
-      this.height = 140;
+      this.width = 312;
+      this.height = 190;
       this.x = canvas.width - this.width;
       this.y = (canvas.height - this.height) - 25;
       this.image = document.querySelector(".food");
@@ -554,8 +556,8 @@ window.addEventListener('load', function(){
     constructor(){
       this.width = 106;
       this.height = 93;
-      this.x = 650;
-      this.y = 285;
+      this.x = (canvas.width - this.width) - 40;
+      this.y = (canvas.height - this.height) - 163;
       this.image = document.querySelector(".foodToEat");
     }
     draw(context){
@@ -565,8 +567,8 @@ window.addEventListener('load', function(){
 
   class Floor {
     constructor(){
-      this.width = 800;
-      this.height = 129;
+      this.width = 1000;
+      this.height = 116;
       this.x = 0;
       this.y = canvas.height - this.height;
       this.image = document.querySelector(".floor");
@@ -578,10 +580,10 @@ window.addEventListener('load', function(){
 
   class Wall {
     constructor(){
-      this.width = 800;
-      this.height = 434;
+      this.width = 1000;
+      this.height = 484;
       this.x = 0;
-      this.y = -15;
+      this.y = 0;
       this.image = document.querySelector(".wall");
     }
     draw(context){
@@ -591,10 +593,10 @@ window.addEventListener('load', function(){
 
   class Scenery {
     constructor(){
-      this.width = 286;
-      this.height = 359;
-      this.x = 380;
-      this.y = 0;
+      this.width = 360;
+      this.height = 333;
+      this.x = 470;
+      this.y = 95;
       this.image = document.querySelector(".scenery");
     }
     draw(context){
@@ -604,10 +606,10 @@ window.addEventListener('load', function(){
 
   class Clock {
     constructor(){
-      this.width = 254;
-      this.height = 49;
-      this.x = 390;
-      this.y = 9;
+      this.width = 314;
+      this.height = 61;
+      this.x = 490;
+      this.y = 30;
       this.image = document.querySelector(".clock");
     }
     draw(context){
@@ -658,18 +660,18 @@ window.addEventListener('load', function(){
 
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
       ctx.fillStyle = "#FFAC12";
-      ctx.font = "30px Consolas";
+      ctx.font = "35px Consolas";
       ctx.strokeStyle = "black";
       ctx.lineWidth = 3;
-      ctx.strokeText(currentTime, 452, 43);
-      ctx.fillText(currentTime, 451.5, 43);
+      ctx.strokeText(currentTime, 565, 72);
+      ctx.fillText(currentTime, 565, 72);
     }
   };
 
   class Snowflake {
     //NEED TO SPLICE OUT OF ARRAY INSTEAD OF REUSING PARTICLES TO END CLEANLY
     constructor(){
-      this.x = Math.random() * 289 + 375;
+      this.x = Math.random() * 365 + 470;
       this.y = Math.random() * canvas.height;
       this.size = Math.random() * 4 + 0.5;
       this.speed = Math.random() * 0.5 + 0.2;
@@ -689,7 +691,7 @@ window.addEventListener('load', function(){
 
   class Raindrop {
     constructor(){
-      this.x = Math.random() * 289 + 375;
+      this.x = Math.random() * 365 + 470;
       this.y = Math.random() * canvas.height;
       this.size = Math.random() * 1.5 + 1;
       this.speed = Math.random() * 2 + 1.3;
@@ -719,16 +721,16 @@ window.addEventListener('load', function(){
       stars[i].x += 0.01;
       stars[i].y += 0.01;
 
-      if (stars[i].x < 377 - stars[i].r) {
-        stars[i].x = 662 + stars[i].r;
-      } else if (stars[i].x > 662 + stars[i].r) {
-          stars[i].x = 377 - stars[i].r;
+      if (stars[i].x < 470 - stars[i].r) {
+        stars[i].x = 835 + stars[i].r;
+      } else if (stars[i].x > 835 + stars[i].r) {
+          stars[i].x = 470 - stars[i].r;
       }
 
-      if (stars[i].y < 0 - stars[i].r) {
-        stars[i].y = 330 + stars[i].r;
-      } else if (stars[i].y > 330 + stars[i].r) {
-        stars[i].y = 0 - stars[i].r;
+      if (stars[i].y < 95 - stars[i].r) {
+        stars[i].y = 410 + stars[i].r;
+      } else if (stars[i].y > 410 + stars[i].r) {
+        stars[i].y = 95 - stars[i].r;
       }
       }
     }
@@ -908,7 +910,7 @@ window.addEventListener('load', function(){
   //*handle collisions with the bed and table
   function handleCollisions() {
     //*bed collision
-    if (player.x <= 270) {
+    if (player.x <= 310) {
       bedCollided = true;
       // console.log("Bed collided.");
     } else {
@@ -916,7 +918,7 @@ window.addEventListener('load', function(){
     }
 
     //*table collision
-    if (player.x >= 410) {
+    if (player.x >= 526) {
       tableCollided = true;
       // console.log("Table collided.");
     } else {
@@ -953,8 +955,8 @@ window.addEventListener('load', function(){
       let speedMult = Math.random() * 1.5 + 0.5;
       stars[i] = {
           r: Math.random() * star.size * canvas.width / 2,
-          x: Math.floor(Math.random() * 289 + 375),
-          y: Math.floor(Math.random() * 330),
+          x: Math.floor(Math.random() * 365 + 470),
+          y: Math.floor(Math.random() * 315) + 95,
           xv: xv * speedMult,
           yv: yv * speedMult
       }

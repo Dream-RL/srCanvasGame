@@ -414,7 +414,7 @@ window.addEventListener('load', function(){
   ];
     
   //* SET LOCATION
-  let nftName = "Tokyo";
+  let nftName = "Wellington";
 
   //# CANVAS
   const canvas = document.getElementById("Canvas");
@@ -455,10 +455,14 @@ window.addEventListener('load', function(){
     sleep: Math.floor(Math.random() * 60) + 1,
   };
 
+  //TODO left and right movement with touch actions
   //# CLASSES
   class InputHandler {
     constructor(){
       this.keys = [];
+      this.touchY = '';
+      this.touchThreshold = 80;
+      //*handles keyboard inputs
       window.addEventListener('keydown', event => {
         if ((event.key == 'ArrowDown' || 
             event.key == 'ArrowUp' || 
@@ -477,6 +481,19 @@ window.addEventListener('load', function(){
             this.keys.splice(this.keys.indexOf(event.key), 1);
         }
         // console.log(event.key, this.keys);
+      });
+      //*handles touch inputs
+      window.addEventListener('touchstart', event => {
+        this.touchY = event.changedTouches[0].pageY;
+      });
+      window.addEventListener('touchmove', event => {
+        const swipeDistance = event.changedTouches[0].pageY - this.touchY;
+        if (swipeDistance < -this.touchThreshold && this.keys.indexOf('swipe up') == -1) this.keys.push('swipe up');
+        else if (swipeDistance > this.touchThreshold && this.keys.indexOf('swipe down') == -1) this.keys.push('swipe down');
+      });
+      window.addEventListener('touchend', event => {
+        this.keys.splice(this.keys.indexOf('swipe down'), 1);
+        this.keys.splice(this.keys.indexOf('swipe up'), 1);
       });
     };
   };
@@ -498,10 +515,10 @@ window.addEventListener('load', function(){
     }
     update(input){
       if (input.keys.indexOf('ArrowRight') > -1) {
-          this.speed = 1.5;
+          this.speed = 1.75;
       } else if(input.keys.indexOf('ArrowLeft') > -1) {
-          this.speed = -1.5;
-      } else if(input.keys.indexOf('ArrowUp') > -1 && this.onGround()) {
+          this.speed = -1.75;
+      } else if((input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('swipe up') > -1) && this.onGround()) {
           this.vy -= 5;
       } else {
           this.speed = 0;

@@ -1,4 +1,4 @@
-window.addEventListener('load', function(){
+window.addEventListener("load", function () {
   const Countries = [
     // canada
     {
@@ -37,7 +37,7 @@ window.addEventListener('load', function(){
       snow: 93,
       sun: 183,
     },
-  
+
     // USA
     {
       name: "Los Angeles",
@@ -92,7 +92,7 @@ window.addEventListener('load', function(){
       snow: 47,
       sun: 126,
     },
-  
+
     // Mexico
     {
       name: "Mexico City",
@@ -112,7 +112,7 @@ window.addEventListener('load', function(){
       snow: 0,
       sun: 270,
     },
-  
+
     // Brazil
     {
       name: "Rio de Janeiro",
@@ -141,7 +141,7 @@ window.addEventListener('load', function(){
       snow: 0,
       sun: 182,
     },
-  
+
     // South America
     // Argentina
     {
@@ -173,7 +173,7 @@ window.addEventListener('load', function(){
       snow: 0,
       sun: 265,
     },
-  
+
     // Europe
     // Germany
     {
@@ -264,7 +264,7 @@ window.addEventListener('load', function(){
       snow: 17,
       sun: 142,
     },
-  
+
     // Asia
     // China
     {
@@ -338,9 +338,9 @@ window.addEventListener('load', function(){
       snow: 0,
       sun: 324,
     },
-  
+
     // Africa
-  
+
     // Ethiopia
     {
       name: "Addis Ababa",
@@ -381,7 +381,7 @@ window.addEventListener('load', function(){
       snow: 1,
       sun: 235,
     },
-  
+
     // Australia
     {
       name: "Sydney",
@@ -412,7 +412,7 @@ window.addEventListener('load', function(){
       sun: 211,
     },
   ];
-    
+
   //*SET LOCATION
   let nftName = "Berlin";
 
@@ -421,7 +421,7 @@ window.addEventListener('load', function(){
   const ctx = canvas.getContext("2d");
   canvas.width = 1000;
   canvas.height = 600;
-  
+
   //# VARIABLES
   let currentHour;
   let currentMinute;
@@ -442,9 +442,15 @@ window.addEventListener('load', function(){
   let facingLeft;
   let facingRight;
   //*variable below must be set
+  let sleeping = false;
+  let sleepInterval = Math.floor(Math.random() * 10000) + 10000;
+  let isSleepTime = false;
   let lastTime = 0;
   let weatherTimer = 0;
   let weatherInterval = 60000;
+  let sleepTimer = 0;
+  let eatTimer = 0;
+  let eatInterval = 60000;
   let deltaTime = 0;
 
   //# OPERATIONS
@@ -452,321 +458,369 @@ window.addEventListener('load', function(){
     return object.name == nftName;
   });
 
-  const ranNums = {
-    eat: Math.floor(Math.random() * 60) + 1,
-    sleep: Math.floor(Math.random() * 60) + 1,
-  };
-
   //TODO left and right movement with touch actions
   //# CLASSES
   class InputHandler {
-    constructor(){
+    constructor() {
       this.keys = [];
-      this.touchY = '';
+      this.touchY = "";
       this.touchThreshold = 80;
       //*handles keyboard inputs
-      window.addEventListener('keydown', event => {
-        if ((event.code == 'ArrowDown' || 
-            event.code == 'ArrowUp' || 
-            event.code == 'ArrowLeft' || 
-            event.code == 'ArrowRight' ||
-            event.code == 'KeyA' ||
-            event.code == 'KeyD' ||
-            event.code == 'KeyW' ||
-            event.code == 'Space') && 
-            this.keys.indexOf(event.code) == -1) {
-            this.keys.push(event.code);
-        }
-        console.log(this.keys);
+      window.addEventListener("keydown", (event) => {
+        if (
+        (event.code == "ArrowDown" ||
+        event.code == "ArrowUp" ||
+        event.code == "ArrowLeft" ||
+        event.code == "ArrowRight" ||
+        event.code == "KeyA" ||
+        event.code == "KeyD" ||
+        event.code == "KeyW" ||
+        event.code == "Space") &&
+        this.keys.indexOf(event.code) == -1
+        ) {
+          this.keys.push(event.code);
+          }
       });
-      window.addEventListener('keyup', event => {
-        if (event.code == 'ArrowDown' || 
-        event.code == 'ArrowUp' || 
-        event.code == 'ArrowLeft' || 
-        event.code == 'ArrowRight' ||
-        event.code == 'KeyA' ||
-        event.code == 'KeyD' ||
-        event.code == 'KeyW' ||
-        event.code == 'Space') {
-            this.keys.splice(this.keys.indexOf(event.code), 1);
+      window.addEventListener("keyup", (event) => {
+        if (
+          event.code == "ArrowDown" ||
+          event.code == "ArrowUp" ||
+          event.code == "ArrowLeft" ||
+          event.code == "ArrowRight" ||
+          event.code == "KeyA" ||
+          event.code == "KeyD" ||
+          event.code == "KeyW" ||
+          event.code == "Space"
+        ) {
+          this.keys.splice(this.keys.indexOf(event.code), 1);
         }
-        console.log(this.keys);
+        // console.log(this.keys);
       });
-      //*handles touch inputs
-      window.addEventListener('touchstart', event => {
+
+      //*mobile inputs
+      window.addEventListener("touchstart", (event) => {
         this.touchY = event.changedTouches[0].pageY;
+        // console.log(event);
+        if (event.changedTouches[0].pageX < window.innerWidth / 3) {
+          // console.log("left");
+          this.keys.push("tap left");
+        } else if (
+          event.changedTouches[0].pageX >=
+          (window.innerWidth / 3) * 2
+        ) {
+          this.keys.push("tap right");
+          // console.log("right");
+        }
       });
-      window.addEventListener('touchmove', event => {
+      window.addEventListener("touchmove", (event) => {
         const swipeDistance = event.changedTouches[0].pageY - this.touchY;
-        if (swipeDistance < -this.touchThreshold && this.keys.indexOf('swipe up') == -1) this.keys.push('swipe up');
-        else if (swipeDistance > this.touchThreshold && this.keys.indexOf('swipe down') == -1) this.keys.push('swipe down');
+        if (
+          swipeDistance < -this.touchThreshold &&
+          this.keys.indexOf("swipe up") == -1
+        )
+          this.keys.push("swipe up");
+        else if (
+          swipeDistance > this.touchThreshold &&
+          this.keys.indexOf("swipe down") == -1
+        )
+          this.keys.push("swipe down");
       });
-      window.addEventListener('touchend', event => {
-        this.keys.splice(this.keys.indexOf('swipe down'), 1);
-        this.keys.splice(this.keys.indexOf('swipe up'), 1);
+      window.addEventListener("touchend", (event) => {
+        this.keys.splice(this.keys.indexOf("swipe down"), 1);
+        this.keys.splice(this.keys.indexOf("swipe up"), 1);
+        this.keys.splice(this.keys.indexOf("tap left"), 1);
+        this.keys.splice(this.keys.indexOf("tap right"), 1);
       });
-    };
-  };
+    }
+  }
 
   class Player {
-    constructor(){
+    constructor() {
       this.width = 302;
       this.height = 205;
-      this.groundHeight = (canvas.height - this.height) - 25;
+      this.groundHeight = canvas.height - this.height - 25;
       this.x = Math.floor(Math.random() * 300) + 100;
       this.y = this.groundHeight;
       this.image = document.querySelector(".player");
       this.speed = 0;
       this.vy = 0;
       this.weight = 0.12;
-      // where on sprite sheet to start
+      //*where on sprite sheet to start
       this.frameX = 7;
       this.frameY = 0;
       this.maxFrame = 20;
       this.fps = 40;
       this.frameTimer = 0;
-      this.frameInterval = 1000/this.fps;
-
-    };
-    draw(context){
-      context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
-      
+      this.frameInterval = 1000 / this.fps;
     }
-    update(input, deltaTime){
-      if (input.keys.indexOf('ArrowRight') > -1 || input.keys.indexOf('KeyD') > -1) {
+    draw(context) {
+      context.drawImage(
+        this.image,
+        this.frameX * this.width,
+        this.frameY * this.height,
+        this.width,
+        this.height,
+        this.x,
+        this.y,
+        this.width,
+        this.height
+      );
+    }
+    update(input, deltaTime) {
+      if (
+        input.keys.indexOf("ArrowRight") > -1 ||
+        input.keys.indexOf("KeyD") > -1 ||
+        input.keys.indexOf("tap right") > -1
+      ) { 
+        if (
+          input.keys.indexOf("ArrowUp") > -1 ||
+          input.keys.indexOf("swipe up") > -1 ||
+          input.keys.indexOf("KeyW") > -1 ||
+          input.keys.indexOf("Space") > -1
+        ) {
+          if (this.onGround()) {
+            this.vy -= 5;
+          }
+        }
         this.speed = 1.75;
-        facingRight = true;    
-        facingLeft = false;  
+        facingRight = true;
+        facingLeft = false;
         //*sprite sheet cycle move right
-        if(this.frameTimer > this.frameInterval){
+        if (this.frameTimer > this.frameInterval) {
           if (this.frameX >= this.maxFrame) this.frameX = 0;
           else {
-            this.frameX++
+            this.frameX++;
             this.frameY = 0;
           }
           this.frameTimer = 0;
-          } else{
+        } else {
           this.frameTimer += deltaTime;
         }
-      } else if(input.keys.indexOf('ArrowLeft') > -1 || input.keys.indexOf('KeyA') > -1) {
-          this.speed = -1.75;
-          facingRight = false;
-          facingLeft = true;
-          //*sprite sheet cycle move left
-          if(this.frameTimer > this.frameInterval){
+      } else if (
+        input.keys.indexOf("ArrowLeft") > -1 ||
+        input.keys.indexOf("KeyA") > -1 ||
+        input.keys.indexOf("tap left") > -1
+      ) {
+        if (
+          input.keys.indexOf("ArrowUp") > -1 ||
+          input.keys.indexOf("swipe up") > -1 ||
+          input.keys.indexOf("KeyW") > -1 ||
+          input.keys.indexOf("Space") > -1
+        ) {
+          if (this.onGround()) {
+            this.vy -= 5;
+          }
+        }
+        this.speed = -1.75;
+        facingRight = false;
+        facingLeft = true;
+        //*sprite sheet cycle move left
+        if (this.frameTimer > this.frameInterval) {
+          if (this.frameX >= this.maxFrame) this.frameX = 0;
+          else {
+            this.frameX++;
+            this.frameY = 1;
+          }
+          this.frameTimer = 0;
+        } else {
+          this.frameTimer += deltaTime;
+        }
+      } else if (
+        input.keys.indexOf("ArrowUp") > -1 ||
+        input.keys.indexOf("swipe up") > -1 ||
+        input.keys.indexOf("KeyW") > -1 ||
+        input.keys.indexOf("Space") > -1
+      ) {
+        if (this.onGround()) {
+          this.vy -= 5;
+        }
+      } else {
+        this.speed = 0;
+        //*facing left idle
+        if (facingLeft == true) {
+          if (this.frameTimer > this.frameInterval) {
             if (this.frameX >= this.maxFrame) this.frameX = 0;
             else {
-              this.frameX++
+              this.frameX++;
               this.frameY = 1;
-            };
+            }
             this.frameTimer = 0;
-            } else{
+          } else {
             this.frameTimer += deltaTime;
+          }
+        }
+        //*facing right idle
+        else {
+          if (this.frameTimer > this.frameInterval) {
+            if (this.frameX >= this.maxFrame) this.frameX = 0;
+            else {
+              this.frameX++;
+              this.frameY = 0;
             }
-      } else if((input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('swipe up') > -1 || input.keys.indexOf('KeyW') > -1 || input.keys.indexOf('Space') > -1)) {
-        if( this.onGround()){
-          this.vy -= 5;
-
-        } 
-        // else if (!this.onGround()){
-        //          // jump animation
-        //          if(this.frameTimer > this.frameInterval){
-        //           if (this.frameX >= 17) this.frameX = 0;
-        //           else {
-        //             this.frameX++
-        //             this.frameY = 2;
-                    
-        //           };
-        //           this.frameTimer = 0;
-        //           } else{
-        //           this.frameTimer += deltaTime;
-        //         }
-        
-
-        // }
-   
-      } else {
-          this.speed = 0;
-          //*facing left idle
-          if (facingLeft == true){
-            if(this.frameTimer > this.frameInterval){
-              if (this.frameX >= this.maxFrame) this.frameX = 0;
-              else {
-                this.frameX++;
-                this.frameY = 1;
-              }
-              this.frameTimer = 0;
-              } else{
-              this.frameTimer += deltaTime;
-            }
-          } 
-          //*facing right idle
-          else {
-            if(this.frameTimer > this.frameInterval){
-              if (this.frameX >= this.maxFrame) this.frameX = 0;
-              else {
-                this.frameX++;
-                this.frameY = 0;
-              }
-              this.frameTimer = 0;
-              } else{
-              this.frameTimer += deltaTime;
-            }
-          } 
-     
-      } 
+            this.frameTimer = 0;
+          } else {
+            this.frameTimer += deltaTime;
+          }
+        }
+      }
 
       //*horizontal movement
       this.x += this.speed;
       if (this.x < 0) this.x = 0;
-      else if (this.x > canvas.width - this.width) this.x = canvas.width - this.width;
+      else if (this.x > canvas.width - this.width)
+        this.x = canvas.width - this.width;
       //*vertical movement
       this.y += this.vy;
-      if (!this.onGround()){
-          this.vy += this.weight;
+      if (!this.onGround()) {
+        this.vy += this.weight;
       } else {
-          this.vy = 0;
+        this.vy = 0;
       }
       if (this.y > this.groundHeight) this.y = this.groundHeight;
     }
-    onGround(){
+    onGround() {
       return this.y >= this.groundHeight;
     }
-  };
+  }
 
   class Bed {
-    constructor(){
+    constructor() {
       canvas.width = canvas.width;
       canvas.height = canvas.height;
       this.width = 377;
       this.height = 247;
       this.x = 0;
-      this.y = (canvas.height - this.height) - 25;
+      this.y = canvas.height - this.height - 25;
       this.image = document.querySelector(".bed");
     }
-    draw(context){
+    draw(context) {
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
-  };
+  }
 
   class Table {
-    constructor(){
+    constructor() {
       this.width = 312;
       this.height = 190;
       this.x = canvas.width - this.width;
-      this.y = (canvas.height - this.height) - 25;
+      this.y = canvas.height - this.height - 25;
       this.image = document.querySelector(".food");
     }
-    draw(context){
+    draw(context) {
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
-  };
+  }
 
   class Food {
-    constructor(){
+    constructor() {
       this.width = 106;
       this.height = 93;
-      this.x = (canvas.width - this.width) - 40;
-      this.y = (canvas.height - this.height) - 163;
+      this.x = canvas.width - this.width - 40;
+      this.y = canvas.height - this.height - 163;
       this.image = document.querySelector(".foodToEat");
     }
-    draw(context){
+    draw(context) {
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
-  };
+  }
 
   class Floor {
-    constructor(){
+    constructor() {
       this.width = 1000;
       this.height = 116;
       this.x = 0;
       this.y = canvas.height - this.height;
       this.image = document.querySelector(".floor");
     }
-    draw(context){
+    draw(context) {
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
-  };
+  }
 
   class Wall {
-    constructor(){
+    constructor() {
       this.width = 1000;
       this.height = 484;
       this.x = 0;
       this.y = 0;
       this.image = document.querySelector(".wall");
     }
-    draw(context){
+    draw(context) {
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
-  };
+  }
 
   class Scenery {
-    constructor(){
+    constructor() {
       this.width = 360;
       this.height = 333;
       this.x = 470;
       this.y = 95;
       this.image = document.querySelector(".scenery");
     }
-    draw(context){
+    draw(context) {
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
-  };
+  }
 
   class Clock {
-    constructor(){
+    constructor() {
       this.width = 314;
       this.height = 61;
       this.x = 490;
       this.y = 30;
       this.image = document.querySelector(".clock");
     }
-    draw(context){
+    draw(context) {
       //*adds a zero to the minutes, seconds, and hour if below 10
-      if (currentMinute < 10 
-      && currentSecond >= 10 
-      && currentHour >= 10
-      ){
+      if (currentMinute < 10 && currentSecond >= 10 && currentHour >= 10) {
         currentTime = currentHour + ":0" + currentMinute + ":" + currentSecond;
-      } else if (currentMinute < 10 
-      && currentSecond < 10 
-      && currentHour >= 10
-      ){
+      } else if (
+        currentMinute < 10 &&
+        currentSecond < 10 &&
+        currentHour >= 10
+      ) {
         currentTime = currentHour + ":0" + currentMinute + ":0" + currentSecond;
-      } else if (currentMinute < 10 
-      && currentSecond < 10 
-      && currentHour < 10
-      ){
-        currentTime = "0" + currentHour + ":0" + currentMinute + ":0" + currentSecond;
-      } else if (currentMinute >= 10 
-      && currentSecond < 10 
-      && currentHour >= 10
-      ){
+      } else if (currentMinute < 10 && currentSecond < 10 && currentHour < 10) {
+        currentTime =
+          "0" + currentHour + ":0" + currentMinute + ":0" + currentSecond;
+      } else if (
+        currentMinute >= 10 &&
+        currentSecond < 10 &&
+        currentHour >= 10
+      ) {
         currentTime = currentHour + ":" + currentMinute + ":0" + currentSecond;
-      } else if (currentMinute >= 10 
-      && currentSecond < 10 
-      && currentHour >= 10
-      ){
-        currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
-      } else if (currentMinute >= 10 
-      && currentSecond >= 10 
-      && currentHour <= 10
-      ){
-        currentTime = "0" + currentHour + ":" + currentMinute + ":" + currentSecond;
-      } else if (currentMinute < 10 
-      && currentSecond >= 10 
-      && currentHour < 10
-      ){
-        currentTime = "0" + currentHour + ":0" + currentMinute + ":" + currentSecond;
-      } else if (currentMinute >= 10 
-      && currentSecond < 10 
-      && currentHour < 10
-      ){
-        currentTime = "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
+      } else if (
+        currentMinute >= 10 &&
+        currentSecond < 10 &&
+        currentHour >= 10
+      ) {
+        currentTime =
+          "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
+      } else if (
+        currentMinute >= 10 &&
+        currentSecond >= 10 &&
+        currentHour <= 10
+      ) {
+        currentTime =
+          "0" + currentHour + ":" + currentMinute + ":" + currentSecond;
+      } else if (
+        currentMinute < 10 &&
+        currentSecond >= 10 &&
+        currentHour < 10
+      ) {
+        currentTime =
+          "0" + currentHour + ":0" + currentMinute + ":" + currentSecond;
+      } else if (
+        currentMinute >= 10 &&
+        currentSecond < 10 &&
+        currentHour < 10
+      ) {
+        currentTime =
+          "0" + currentHour + ":" + currentMinute + ":0" + currentSecond;
       } else {
         currentTime = currentHour + ":" + currentMinute + ":" + currentSecond;
-      };
+      }
 
       context.drawImage(this.image, this.x, this.y, this.width, this.height);
       ctx.fillStyle = "#FFAC12";
@@ -776,75 +830,75 @@ window.addEventListener('load', function(){
       ctx.strokeText(currentTime, 565, 72);
       ctx.fillText(currentTime, 565, 72);
     }
-  };
+  }
 
   class Snowflake {
     //NEED TO SPLICE OUT OF ARRAY INSTEAD OF REUSING PARTICLES TO END CLEANLY
-    constructor(){
+    constructor() {
       this.x = Math.random() * 365 + 470;
       this.y = Math.random() * canvas.height;
       this.size = Math.random() * 4 + 0.5;
       this.speed = Math.random() * 0.5 + 0.2;
     }
-    update(){
+    update() {
       this.y += this.speed;
       if (this.y - this.size > canvas.height) this.y = 0 - this.size;
     }
-    draw(canvas){
+    draw(canvas) {
       const ctx = canvas.getContext("2d");
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = "white";
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
     }
-  };
+  }
 
   class Raindrop {
-    constructor(){
+    constructor() {
       this.x = Math.random() * 365 + 470;
       this.y = Math.random() * canvas.height;
       this.size = Math.random() * 1.5 + 1;
       this.speed = Math.random() * 2 + 1.3;
     }
-    update(){
+    update() {
       this.y += this.speed;
       if (this.y - this.size > canvas.height) this.y = 0 - this.size;
     }
-    draw(canvas){
+    draw(canvas) {
       const ctx = canvas.getContext("2d");
-      ctx.fillStyle = 'blue';
+      ctx.fillStyle = "blue";
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
     }
-  };
+  }
 
   class Stars {
-    constructor(){
-      this.colorStars = 'lightyellow';
+    constructor() {
+      this.colorStars = "lightyellow";
       this.starNum = 120;
       this.size = 0.0025;
-      this.speed = 0.03; 
+      this.speed = 0.03;
     }
-    update(){
+    update() {
       for (let i = 0; i < star.starNum; i++) {
-      stars[i].x += 0.01;
-      stars[i].y += 0.01;
+        stars[i].x += 0.01;
+        stars[i].y += 0.01;
 
-      if (stars[i].x < 470 - stars[i].r) {
-        stars[i].x = 835 + stars[i].r;
-      } else if (stars[i].x > 835 + stars[i].r) {
+        if (stars[i].x < 470 - stars[i].r) {
+          stars[i].x = 835 + stars[i].r;
+        } else if (stars[i].x > 835 + stars[i].r) {
           stars[i].x = 470 - stars[i].r;
-      }
+        }
 
-      if (stars[i].y < 95 - stars[i].r) {
-        stars[i].y = 410 + stars[i].r;
-      } else if (stars[i].y > 410 + stars[i].r) {
-        stars[i].y = 95 - stars[i].r;
-      }
+        if (stars[i].y < 95 - stars[i].r) {
+          stars[i].y = 410 + stars[i].r;
+        } else if (stars[i].y > 410 + stars[i].r) {
+          stars[i].y = 95 - stars[i].r;
+        }
       }
     }
-    draw(canvas){
+    draw(canvas) {
       const ctx = canvas.getContext("2d");
       ctx.fillStyle = star.colorStars;
       for (let i = 0; i < star.starNum; i++) {
@@ -853,9 +907,107 @@ window.addEventListener('load', function(){
         ctx.fill();
       }
     }
-  };
+  }
+
+  class SleepButton {
+    constructor() {
+      this.x = 20;
+      this.y = 100;
+      this.height = 50;
+      this.width = 200;
+      this.image = document.querySelector(".sleepBtn");
+    }
+    draw(canvas) {
+      if (isSleepTime == true && bedCollided) {
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "black";
+        // console.log("sleep time");
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+      }
+    }
+  }
+
+  class WakeButton {
+    constructor() {
+      this.x = 20;
+      this.y = 300;
+      this.height = 50;
+      this.width = 200;
+      this.image = document.querySelector(".sleepBtn");
+    }
+    draw(canvas) {
+      if (sleeping) {
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "black";
+        // console.log("sleep time");
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+      }
+    }
+  }
+
+  class SleepIcon {
+    constructor() {
+      this.x = 20;
+      this.y = 20;
+      this.height = 50;
+      this.width = 50;
+      this.image = document.querySelector(".sleepIcon");
+    }
+    draw(canvas) {
+      if (isSleepTime == true) {
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+      }
+    }
+  }
 
   //# FUNCTIONS
+
+  function handleSleepTime() {
+    // sleepInterval = Math.floor(Math.random() * 360000) + 360000;
+    sleepInterval = Math.floor(Math.random() * 10000) + 10000;
+    console.log("time to sleep");
+    isSleepTime = true;
+    sleeping = false;
+  }
+
+  function handleSleepClick(event) {
+    const ctx = canvas.getContext("2d");
+    let bound = canvas.getBoundingClientRect();
+    let x = event.clientX - bound.left - canvas.clientLeft;
+    let y = event.clientY - bound.top - canvas.clientTop;
+    if (
+      bedCollided &&
+      isSleepTime &&
+      x < sleepButton.x + sleepButton.width &&
+      x > sleepButton.x &&
+      y > sleepButton.y &&
+      y < sleepButton.y + sleepButton.height
+    ) {
+      console.log("sleep button clicked");
+      sleeping = true;
+      isSleepTime = false;
+    }
+  }
+
+  function handleWakeClick(event) {
+    const ctx = canvas.getContext("2d");
+    let bound = canvas.getBoundingClientRect();
+    let x = event.clientX - bound.left - canvas.clientLeft;
+    let y = event.clientY - bound.top - canvas.clientTop;
+    if (
+      sleeping &&
+      x < wakeButton.x + wakeButton.width &&
+      x > wakeButton.x &&
+      y > wakeButton.y &&
+      y < wakeButton.y + wakeButton.height
+    ) {
+      console.log("wake button clicked");
+      sleeping = false;
+      isSleepTime = false;
+    }
+  }
+
   function time() {
     date = new Date();
     currentHour = date.getUTCHours() + Countries[index].time;
@@ -877,8 +1029,8 @@ window.addEventListener('load', function(){
       } else {
         currentMinute = adjustedMinute;
       }
-    } 
-    //*countries that do not need 30 minutes added 
+    }
+    //*countries that do not need 30 minutes added
     else {
       currentMinute = date.getUTCMinutes();
     }
@@ -914,11 +1066,10 @@ window.addEventListener('load', function(){
       evening = false;
       nightTime = true;
     }
-  };
+  }
 
   //*determine which type of weather will happen
   function weather() {
-
     let chance = Math.floor(Math.random() * 365) + 1;
     let rainChance = Countries[index].rain - Countries[index].snow;
 
@@ -929,7 +1080,7 @@ window.addEventListener('load', function(){
       raining = true;
       snowing = false;
       sunny = false;
-    } 
+    }
     //*snowing
     else if (
       chance > rainChance &&
@@ -940,7 +1091,7 @@ window.addEventListener('load', function(){
       snowing = true;
       sunny = false;
       raining = false;
-    } 
+    }
     //*sunny/clear
     else if (
       chance > rainChance &&
@@ -951,7 +1102,7 @@ window.addEventListener('load', function(){
       snowing = false;
       raining = false;
     }
-  };
+  }
 
   //TODO bg color transition happens on page load
   //TODO would be nice to have rain/snow/stars transition in and out when called
@@ -982,32 +1133,30 @@ window.addEventListener('load', function(){
       canvas.style.background = "#737EBF";
     } else if (nightTime == true && sunny == true) {
       canvas.style.background = "#0D0627";
-    };
+    }
 
     //*draw stars
     if (nightTime == true) {
       star.draw(canvas);
       star.update();
-    };
-    
+    }
+
     //*draw scenery
     scenery.draw(ctx);
 
     //*draw and update rain and snow
     if (raining == true) {
       for (let i = 0; i < rainArray.length; i++) {
-      rainArray[i].update();
-      rainArray[i].draw(canvas);
+        rainArray[i].update();
+        rainArray[i].draw(canvas);
       }
     } else if (snowing == true) {
       for (let i = 0; i < snowArray.length; i++) {
-      snowArray[i].update();
-      snowArray[i].draw(canvas);
+        snowArray[i].update();
+        snowArray[i].draw(canvas);
       }
-    };
-
-
-  };
+    }
+  }
 
   //*handle click event
   function handleClick(event) {
@@ -1015,12 +1164,12 @@ window.addEventListener('load', function(){
     let x = event.clientX - bound.left - canvas.clientLeft;
     let y = event.clientY - bound.top - canvas.clientTop;
     console.log("clicked X:" + x + " Y:" + y);
-  };
+  }
 
   //*handle collisions with the bed and table
   function handleCollisions() {
     //*bed collision
-    if (player.x <= (bed.x + bed.width) - 65) {
+    if (player.x <= bed.x + bed.width) {
       bedCollided = true;
       // console.log("Bed collided.");
     } else {
@@ -1028,20 +1177,25 @@ window.addEventListener('load', function(){
     }
 
     //*table collision
-    if (player.x >= (table.x - player.width) + 100) {
+    if (player.x >= table.x - player.width + 100) {
       tableCollided = true;
       // console.log("Table collided.");
     } else {
       tableCollided = false;
     }
-  };
+  }
 
   //# EVENT LISTENERS
   document.addEventListener("click", (event) => {
     handleClick(event);
+    handleSleepClick(event);
+    handleWakeClick(event);
   });
 
   //# INITIALIZE CLASS OBJECTS
+  const sleepIcon = new SleepIcon();
+  const sleepButton = new SleepButton();
+  const wakeButton = new WakeButton();
   const input = new InputHandler();
   const player = new Player();
   const bed = new Bed();
@@ -1053,35 +1207,42 @@ window.addEventListener('load', function(){
   const clock = new Clock();
   const star = new Stars();
   const snowArray = [];
-  for (let i = 0; i < 100; i++){
-    snowArray.push(new Snowflake);
-  };
+  for (let i = 0; i < 100; i++) {
+    snowArray.push(new Snowflake());
+  }
   const rainArray = [];
-  for (let i = 0; i < 75; i++){
-    rainArray.push(new Raindrop);
-  };
+  for (let i = 0; i < 75; i++) {
+    rainArray.push(new Raindrop());
+  }
   const stars = [];
   for (let i = 0; i < star.starNum; i++) {
     let speedMult = Math.random() * 1.5 + 0.5;
     stars[i] = {
-      r: Math.random() * star.size * canvas.width / 2,
+      r: (Math.random() * star.size * canvas.width) / 2,
       x: Math.floor(Math.random() * 365 + 470),
       y: Math.floor(Math.random() * 315) + 95,
       xv: xv * speedMult,
-      yv: yv * speedMult
-    }
-  };
- 
+      yv: yv * speedMult,
+    };
+  }
+
   //# CALL ON LOAD
   function animate(timeStamp) {
-    
     //*track time between animation frames
     deltaTime = timeStamp - lastTime;
     lastTime = timeStamp;
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     time();
     handleCollisions();
+
+    //*eat and sleep
+    if (sleepTimer > sleepInterval && !sleeping) {
+      handleSleepTime();
+      sleepTimer = 0;
+    } else {
+      sleepTimer += deltaTime;
+    }
 
     //*call weather function when the weatherInterval has passed
     if (weatherTimer > weatherInterval) {
@@ -1089,8 +1250,8 @@ window.addEventListener('load', function(){
       weatherTimer = 0;
     } else {
       weatherTimer += deltaTime;
-    };
-   
+    }
+
     //*draw and update all of the visual elements on screen
     handleBackground();
     wall.draw(ctx);
@@ -1098,9 +1259,17 @@ window.addEventListener('load', function(){
     bed.draw(ctx);
     table.draw(ctx);
     food.draw(ctx);
-    player.draw(ctx);
+
+    if (!sleeping) {
+      player.draw(ctx);
+      player.update(input, deltaTime);
+    }
+
     clock.draw(ctx);
-    player.update(input, deltaTime);
+
+    sleepButton.draw(canvas);
+    sleepIcon.draw(canvas);
+    wakeButton.draw(canvas);
 
     requestAnimationFrame(animate);
   }

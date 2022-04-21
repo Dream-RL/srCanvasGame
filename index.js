@@ -544,7 +544,7 @@ window.addEventListener("load", function () {
       this.image = document.querySelector(".player");
       this.speed = 0;
       this.vy = 0;
-      this.weight = 0.12;
+      this.weight = 0.08;
       //*where on sprite sheet to start
       this.frameX = 7;
       this.frameY = 0;
@@ -962,52 +962,6 @@ window.addEventListener("load", function () {
   }
 
   //# FUNCTIONS
-
-  function handleSleepTime() {
-    // sleepInterval = Math.floor(Math.random() * 360000) + 360000;
-    sleepInterval = Math.floor(Math.random() * 10000) + 10000;
-    console.log("time to sleep");
-    isSleepTime = true;
-    sleeping = false;
-  }
-
-  function handleSleepClick(event) {
-    const ctx = canvas.getContext("2d");
-    let bound = canvas.getBoundingClientRect();
-    let x = event.clientX - bound.left - canvas.clientLeft;
-    let y = event.clientY - bound.top - canvas.clientTop;
-    if (
-      bedCollided &&
-      isSleepTime &&
-      x < sleepButton.x + sleepButton.width &&
-      x > sleepButton.x &&
-      y > sleepButton.y &&
-      y < sleepButton.y + sleepButton.height
-    ) {
-      console.log("sleep button clicked");
-      sleeping = true;
-      isSleepTime = false;
-    }
-  }
-
-  function handleWakeClick(event) {
-    const ctx = canvas.getContext("2d");
-    let bound = canvas.getBoundingClientRect();
-    let x = event.clientX - bound.left - canvas.clientLeft;
-    let y = event.clientY - bound.top - canvas.clientTop;
-    if (
-      sleeping &&
-      x < wakeButton.x + wakeButton.width &&
-      x > wakeButton.x &&
-      y > wakeButton.y &&
-      y < wakeButton.y + wakeButton.height
-    ) {
-      console.log("wake button clicked");
-      sleeping = false;
-      isSleepTime = false;
-    }
-  }
-
   function time() {
     date = new Date();
     currentHour = date.getUTCHours() + Countries[index].time;
@@ -1066,6 +1020,14 @@ window.addEventListener("load", function () {
       evening = false;
       nightTime = true;
     }
+  }
+
+  function handleSleepTime() {
+    // sleepInterval = Math.floor(Math.random() * 360000) + 360000;
+    sleepInterval = Math.floor(Math.random() * 10000) + 10000;
+    console.log("time to sleep");
+    isSleepTime = true;
+    sleeping = false;
   }
 
   //*determine which type of weather will happen
@@ -1164,6 +1126,44 @@ window.addEventListener("load", function () {
     let x = event.clientX - bound.left - canvas.clientLeft;
     let y = event.clientY - bound.top - canvas.clientTop;
     console.log("clicked X:" + x + " Y:" + y);
+  }
+
+  function handleSleepClick(event) {
+    const ctx = canvas.getContext("2d");
+    let bound = canvas.getBoundingClientRect();
+    let x = event.clientX - bound.left - canvas.clientLeft;
+    let y = event.clientY - bound.top - canvas.clientTop;
+    if (
+      bedCollided &&
+      isSleepTime &&
+      x < sleepButton.x + sleepButton.width &&
+      x > sleepButton.x &&
+      y > sleepButton.y &&
+      y < sleepButton.y + sleepButton.height
+    ) {
+      console.log("sleep button clicked");
+      sleeping = true;
+      isSleepTime = false;
+    }
+  }
+
+  function handleWakeClick(event) {
+    const ctx = canvas.getContext("2d");
+    let bound = canvas.getBoundingClientRect();
+    let x = event.clientX - bound.left - canvas.clientLeft;
+    let y = event.clientY - bound.top - canvas.clientTop;
+    if (
+      sleeping &&
+      x < wakeButton.x + wakeButton.width &&
+      x > wakeButton.x &&
+      y > wakeButton.y &&
+      y < wakeButton.y + wakeButton.height
+    ) {
+      console.log("wake button clicked");
+      sleeping = false;
+      isSleepTime = false;
+      sleepTimer = 0;
+    }
   }
 
   //*handle collisions with the bed and table

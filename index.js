@@ -441,6 +441,12 @@ window.addEventListener("load", function () {
   let yv;
   let facingLeft;
   let facingRight;
+  let foodHovered = false;
+  let petCount = 0;
+  // karma being 1-10, 1 being mad/sad, 10 being happy, start at normal
+  let karma = 5;
+  let foodImage = document.querySelector(".foodToEat");
+
   //*variable below must be set
   let sleeping = false;
   let sleepInterval = Math.floor(Math.random() * 10000) + 10000;
@@ -457,6 +463,9 @@ window.addEventListener("load", function () {
   const index = Countries.findIndex((object) => {
     return object.name == nftName;
   });
+
+  let randomEat = Math.floor(Math.random() * 60) + 1;
+  let randomSleep = Math.floor(Math.random() * 60) + 1;
 
   //TODO left and right movement with touch actions
   //# CLASSES
@@ -920,7 +929,6 @@ window.addEventListener("load", function () {
     draw(canvas) {
       if (isSleepTime == true && bedCollided) {
         const ctx = canvas.getContext("2d");
-        ctx.fillStyle = "black";
         // console.log("sleep time");
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
       }
@@ -929,6 +937,7 @@ window.addEventListener("load", function () {
 
   class WakeButton {
     constructor() {
+      const ctx = canvas.getContext("2d");
       this.x = 20;
       this.y = 300;
       this.height = 50;
@@ -938,8 +947,6 @@ window.addEventListener("load", function () {
     draw(canvas) {
       if (sleeping) {
         const ctx = canvas.getContext("2d");
-        ctx.fillStyle = "black";
-        // console.log("sleep time");
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
       }
     }
@@ -1020,6 +1027,20 @@ window.addEventListener("load", function () {
       evening = false;
       nightTime = true;
     }
+
+    // handle food reset
+    if (currentMinute % 1 == 0 && currentSecond == 1) {
+      console.log("food reset");
+      food.x = canvas.width - food.width - 40;
+      food.y = canvas.height - food.height - 163;
+    }
+
+    // reset pets when you want, probably every 3 to 5 minutes
+    if (currentMinute % 3 == 0 && currentSecond == 1) {
+      petCount = 0;
+      console.log("pet count reset");
+    }
+
   }
 
   function handleSleepTime() {
@@ -1185,11 +1206,90 @@ window.addEventListener("load", function () {
     }
   }
 
+  // handle pets given
+  function handlePets(event) {
+    let bound = canvas.getBoundingClientRect();
+    let x = event.clientX - bound.left - canvas.clientLeft;
+    let y = event.clientY - bound.top - canvas.clientTop;
+    if (
+      x > player.x &&
+      x < player.x + player.width &&
+      y < player.y + player.height &&
+      y > player.y
+    ) {
+      petCount += 1;
+      // change this to an animation
+      console.log("clicked player");
+      if (petCount >= 4) {
+        console.log("Too many pets right now.");
+      }
+    }
+  }
+
+  // handle food drag event
+  function handleFood(event) {
+    let bound = canvas.getBoundingClientRect();
+    let x = event.clientX - bound.left - canvas.clientLeft;
+    let y = event.clientY - bound.top - canvas.clientTop;
+    if (foodHovered == true) {
+      if (
+        food.x > player.x &&
+        food.x < player.x + player.width &&
+        food.y > player.y &&
+        food.y < player.y + player.height
+      ) {
+        // makes food disappear
+        food.x = -100;
+        food.y = -100;
+        foodHovered = false;
+      } else {
+        if (food.x > x) {
+          food.x -= 2.5;
+        } else {
+          food.x += 2.5;
+        }
+        if (food.y > y) {
+          food.y -= 2.5;
+        } else {
+          food.y += 2.5;
+        }
+      }
+    }
+  }
+
+  //  gets called when food is clicked
+  function foodClickHandle(event) {
+    let bound = canvas.getBoundingClientRect();
+    let x = event.clientX - bound.left - canvas.clientLeft;
+    let y = event.clientY - bound.top - canvas.clientTop;
+    if (
+      x > food.x &&
+      y > food.y &&
+      x < food.x + food.width &&
+      y < food.y + food.height &&
+      foodHovered == false
+    ) {
+      console.log("picked food up");
+
+      foodHovered = true;
+    } else {
+      foodHovered = false;
+      console.log("set food down");
+    }
+  }
+  
+
   //# EVENT LISTENERS
   document.addEventListener("click", (event) => {
     handleClick(event);
     handleSleepClick(event);
     handleWakeClick(event);
+    foodClickHandle(event);
+    handlePets(event);
+  });
+
+  document.addEventListener("mousemove", (event) => {
+    handleFood(event);
   });
 
   //# INITIALIZE CLASS OBJECTS
